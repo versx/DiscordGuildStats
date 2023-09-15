@@ -1,6 +1,6 @@
 import { Client } from 'discord.js';
-import { readdirSync } from 'fs';
-import { join } from 'path';
+import { readdirSync } from 'node:fs';
+import { join } from 'node:path';
 
 import { color } from '../services/utils';
 import { BotEvent } from '../types';
