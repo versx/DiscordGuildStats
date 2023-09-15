@@ -1,14 +1,14 @@
 import { GuildChannel } from 'discord.js';
 
-import { log } from '../services';
+import { logDebug, updateGuilds } from '../services';
 import { BotEvent } from '../types';
 
 const event: BotEvent = {
   name: 'channelDelete',
   once: false,
   execute: async (channel: GuildChannel) => {
-    log(`[${channel.guild.name}] Channel ${channel.name} deleted.`);
-    // TODO: Trigger stats update
+    logDebug(`[${channel.guild.name}] Channel ${channel.name} deleted.`);
+    await updateGuilds(channel.client, false);
   },
 };
 

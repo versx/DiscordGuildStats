@@ -1,14 +1,14 @@
 import { Role } from 'discord.js';
 
-import { log } from '../services';
+import { logDebug, updateGuilds } from '../services';
 import { BotEvent } from '../types';
 
 const event: BotEvent = {
   name: 'roleDelete',
   once: false,
   execute: async (role: Role) => {
-    log(`[${role.guild.name}] Role ${role.name} deleted.`);
-    // TODO: Trigger stats update
+    logDebug(`[${role.guild.name}] Role ${role.name} deleted.`);
+    await updateGuilds(role.client, false);
   },
 };
 
