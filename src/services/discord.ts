@@ -5,65 +5,90 @@ import {
   Snowflake,
 } from 'discord.js';
 
-import { color, sleep } from '.';
+import { color, getTime, isAlreadyUpdated, sleep } from '.';
+import { lastUpdated } from '../data';
 import { GuildStatsConfig } from '../types';
 const config: GuildStatsConfig = require('../config.json');
 
-const SleepBetweenGuilds = 5;
-const SleepBetweenChannels = 1;
+const SleepBetweenGuilds = 5; // 5
+const SleepBetweenChannels = 3; // 2
 
 export const updateGuildStats = async (client: Client, reset: boolean) => {
   const guilds = client.guilds.cache.filter((guild) => !!config.servers[guild.id]);
   if (guilds.size === 0) {
-    console.warn('no guilds available, skipping ready initialization...');
+    console.error(`[${client.user?.id}] Bot is not in any guilds, skipping...`);
     return;
   }
 
   for (const [guildId, guild] of guilds) {
-    if (!config.servers[guildId]) {
-      console.warn(`guild ${guild.name} (${guildId}) not configured, skipping`);
+    if (isAlreadyUpdated(guildId, config.updateIntervalM)) {
+      //console.debug(`[${guildId}] Guild already updated within ${config.updateIntervalM} minutes, skipping...`);
       continue;
     }
 
-    console.log(`${color('text', `Updating guild ${color('variable', guild.name)}`)}`);
     //const category = await getOrCreateCategory(guild, config.servers[guildId]);
-    const guildConfig = config.servers[guild.id];
-    if (guildConfig.status) {
-      guild.client.user?.setActivity(guildConfig.status);
+    const guildConfig = config.servers[guildId];
+    if (!guildConfig) {
+      console.warn(`[${guildId}] Failed to get guild config.`);
+      continue;
     }
-  
+
+    if (guildConfig?.status) {
+      guild.client.user?.setActivity(guildConfig.status);
+      //guild.client.user?.setPresence({
+      //  status: 'online',
+      //  afk: false,
+      //  activities: [{
+      //    name: 'TEST STATUS',
+      //    url: 'https://www.twitch.tv/versx',
+      //    type: ActivityType.Streaming,
+      //  }],
+      //});
+    }
+
     // Fetch full list of members so bots are included
-    await guild.members.fetch();
-  
+    //await guild.members.fetch();
+
+    console.log(`${color('text', `Checking guild ${color('variable', guild.name)} for updates...`)}`);
+
+    const members = await guild.members.fetch();
     const memberCount = reset ? 0 : guild.memberCount.toLocaleString();
-    const botCount = reset ? 0 : guild.members.cache.filter(member => !!member.user.bot).size.toLocaleString();
+    //const botCount = reset ? 0 : guild.members.cache.filter(member => !!member.user.bot).size.toLocaleString();
+    const botCount = reset ? 0 : members.filter(member => !!member.user.bot).size.toLocaleString();
     const roleCount = reset ? 0 : guild.roles.cache.size.toLocaleString();
     const channelCount = reset ? 0 : guild.channels.cache.size.toLocaleString();
-    await updateChannelName(guild, guildConfig.memberCountChannelId, `Member Count: ${memberCount}`);
-    await updateChannelName(guild, guildConfig.botCountChannelId, `Bot Count: ${botCount}`);
-    await updateChannelName(guild, guildConfig.roleCountChannelId, `Role Count: ${roleCount}`);
-    await updateChannelName(guild, guildConfig.channelCountChannelId, `Channel Count: ${channelCount}`);
-  
+
+    // TODO: Voice Channels/Text Channels count
+    await updateChannelName(guild, guildConfig.memberCountChannelId, `Members: ${memberCount}`);
+    await updateChannelName(guild, guildConfig.botCountChannelId, `Bots: ${botCount}`);
+    await updateChannelName(guild, guildConfig.roleCountChannelId, `Roles: ${roleCount}`);
+    await updateChannelName(guild, guildConfig.channelCountChannelId, `Channels: ${channelCount}`);
     await getGuildMemberRoleCounts(guild, reset);
+
+    console.log(`${color('text', `Updated guild ${color('variable', guild.name)} channel names...`)}`);
+
+    lastUpdated[guildId] = getTime();
 
     // Wait 5 seconds between each guild update
     await sleep(SleepBetweenGuilds * 1000);
   }
 };
 
-export const updateChannelName = async (guild: Guild, channelId: string, newName: string) => {
-  const channel = await guild.channels.fetch(channelId);
+export const updateChannelName = async (guild: Guild, channelId: Snowflake, newName: string) => {
+  const channel = await guild.channels.fetch(channelId); //.cache.get(channelId);
   if (!channel) {
-    console.warn('failed to get channel with id:', channelId);
+    console.warn(`[${channelId}] Failed to get channel.`);
     return;
   }
 
   if (channel.name === newName) {
-    console.warn('channel', channel.name, 'name already set to', newName, 'skipping...');
+    //console.debug(`[${channelId}] Channel name already set to '${newName}', skipping...`);
     return;
   }
+  
+  console.log(`[${new Date().toLocaleTimeString()}] [${guild.name}, ${channelId}] Channel name changed, updating from '${channel.name}' to '${newName}'.`);
+  await channel.setName(newName, 'update channel name');
 
-  await channel.setName(newName);
   // Wait three seconds between each channel update
   await sleep(SleepBetweenChannels * 1000);
 };
@@ -76,29 +101,24 @@ export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean) => 
 
   const memberRoles = guildConfig.memberRoles;
   for (const roleChannelId of Object.keys(memberRoles)) {
+    await sleep(250);
+
     const channel = await guild.channels.fetch(roleChannelId);
     if (!channel) {
-      console.warn('failed to get role channel with id', roleChannelId);
+      console.warn(`[${roleChannelId}] Failed to get role channel.`);
       continue;
     }
 
     const { text, roleIds } = memberRoles[roleChannelId];
-    const count = reset
-      ? 0
-      : guild.members.cache.filter((member) => hasRole(member, roleIds)).size;
+    const members = await guild.members.fetch();
+    const count = reset ? 0 : members.filter((member) => hasRole(member, roleIds)).size;
     const newName = `${text}: ${count.toLocaleString()}`;
     await updateChannelName(guild, roleChannelId, newName);
   }
 };
 
 export const hasRole = (member: GuildMember, roleIds: Snowflake[]) => {
-  let count = 0;
-  const roles = member.roles.cache;
-  for (const roleId of roleIds) {
-    if (roles.has(roleId)) {
-      count++;
-    }
-  }
+  const count = roleIds.filter((roleId) => member.roles.cache.has(roleId)).length;
   return count;
 };
 
