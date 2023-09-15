@@ -1,5 +1,4 @@
 {
-  "updateIntervalM": 15,
   "servers": {
     "<DISCORD_GUILD1_ID>": {
       "name": "<DESCRIPTIVE_NAME>",
@@ -7,6 +6,11 @@
       "botCountChannelId": "00000000000002",
       "roleCountChannelId": "00000000000003",
       "channelCountChannelId": "00000000000004",
+      "inviteCountChannelId": "00000000000005",
+      "banCountChannelId": "00000000000006",
+      "eventCountChannelId": "00000000000007",
+      "reactionCountChannelId": "00000000000008",
+      "stickerCountChannelId": "00000000000009",
       "memberRoles": {
         "<DISCORD_ROLE_CHANNEL1_ID>": {
           "roleIds": ["<DISCORD_ROLE1_ID>"],
@@ -16,9 +20,12 @@
           "roleIds": ["<DISCORD_ROLE2_ID>"],
           "text": "Supporters"
         }
-      },
-      "token": "<DISCORD_BOT_TOKEN>",
-      "status": null
+      }
     }
-  }
+  },
+  "sleepBetweenChannels": 250,
+  "sleepBetweenGuilds": 3000,
+  "status": null,
+  "token": "<DISCORD_BOT_TOKEN>",
+  "updateIntervalM": 15
 }

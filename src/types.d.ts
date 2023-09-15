@@ -23,26 +23,32 @@ export interface BotEvent {
   execute: (...args?) => void,
 };
 
-export type GuildStatsConfig = {
-  updateIntervalM: number;
+export type DiscordGuildStatsConfig = {
   servers: {
     [guildId: Snowflake]: DiscordGuildConfig;
   };
+  sleepBetweenGuilds: number;
+  sleepBetweenChannels: number;
+  status?: string | null;
+  token: string;
+  updateIntervalM: number;
 };
 
 export type DiscordGuildConfig = {
   name?: string;
-  memberCountChannelId: Snowflake;
-  botCountChannelId: Snowflake;
-  roleCountChannelId: Snowflake;
-  channelCountChannelId: Snowflake;
+  memberCountChannelId: Snowflake | null;
+  botCountChannelId: Snowflake | null;
+  roleCountChannelId: Snowflake | null;
+  channelCountChannelId: Snowflake | null;
+  inviteCountChannelId: Snowflake | null;
+  banCountChannelId: Snowflake | null;
+  eventCountChannelId: Snowflake | null;
+  reactionCountChannelId: Snowflake | null;
+  stickerCountChannelId: Snowflake | null;
   memberRoles: {
     [roleId: Snowflake]: DiscordMemberRolesConfig;
   };
-  token: string;
-  status?: string | null;
-
-  category?: DiscordCategoryConfig;
+  //category?: DiscordCategoryConfig;
 };
 
 export type DiscordMemberRolesConfig = {
@@ -56,6 +62,6 @@ export type DiscordCategoryConfig = {
   displayIndex: number;
 };
 
-export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'memberRoles';
+export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'memberRoles' | 'invites' | 'bans';
 
-export type ColorType = 'text' | 'variable' | 'error';
+export type ColorType = 'text' | 'variable' | 'error' | 'date';
