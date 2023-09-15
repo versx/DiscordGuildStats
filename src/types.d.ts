@@ -26,6 +26,7 @@ export interface BotEvent {
 export type DiscordGuildStatsConfig = {
   dumpStatistics: {
     enabled: boolean;
+    data: StatType[];
     fileName: string;
   };
   logLevel: LogLevel;
@@ -78,9 +79,23 @@ export type RoleStatistic = {
 };
 
 export type DumpStats = {
-  [guildName: string]: {
-    [column: string]: string | number;
-  };
+  [guildName: string]: GuildDumpStats;
+};
+
+export type GuildDumpStats = {
+  [column: string]: string | number;
+};
+
+export type GuildStatistics = {
+  members: number;
+  bots: number;
+  roles: number;
+  channels: number;
+  invites: number;
+  bans: number;
+  reactions: number;
+  stickers: number;
+  scheduledEvents: number;
 };
 
 export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'memberRoles' | 'invites' | 'bans' | 'reactions' | 'stickers' | 'scheduledEvents';

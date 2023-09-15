@@ -24,6 +24,51 @@ import {
 const config: DiscordGuildStatsConfig = require('../config.json');
 let lastUpdated: { [guildId: Snowflake]: number } = {};
 
+export const buildStatistics = async (guild: Guild, counts: GuildStatistics, reset: boolean): Promise<GuildDumpStats> => {
+  const stats: GuildDumpStats = {
+    Date: formatDate(new Date()),
+    Guild: guild.name,
+  };
+
+  if (config.dumpStatistics.data.includes('members')) {
+    stats[locales.Members] = counts.members;
+  }
+  if (config.dumpStatistics.data.includes('bots')) {
+    stats[locales.Bots] = counts.bots;
+  }
+  if (config.dumpStatistics.data.includes('roles')) {
+    stats[locales.Roles] = counts.roles;
+  }
+  if (config.dumpStatistics.data.includes('channels')) {
+    stats[locales.Channels] = counts.channels;
+  }
+  if (config.dumpStatistics.data.includes('invites')) {
+    stats[locales.Invites] = counts.invites;
+  }
+  if (config.dumpStatistics.data.includes('bans')) {
+    stats[locales.Bans] = counts.bans;
+  }
+  if (config.dumpStatistics.data.includes('reactions')) {
+    stats[locales.Reactions] = counts.reactions;
+  }
+  if (config.dumpStatistics.data.includes('stickers')) {
+    stats[locales.Stickers] = counts.stickers;
+  }
+  if (config.dumpStatistics.data.includes('scheduledEvents')) {
+    stats[locales.ScheduledEvents] = counts.scheduledEvents;
+  }
+
+  if (config.dumpStatistics.data.includes('memberRoles')) {
+    const roleStats = await getGuildMemberRoleCounts(guild, reset);
+    for (const roleChannelId in roleStats) {
+      const roleStat = roleStats[roleChannelId];
+      stats[roleStat.text] = roleStat.count;
+    }
+  }
+
+  return stats;
+};
+
 export const updateGuilds = async (client: Client, reset: boolean) => {
   const guilds = client.guilds.cache.filter((guild) => !!config.servers[guild.id]);
   if (guilds.size === 0) {
@@ -131,21 +176,9 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
       }
     }
 
+    // Build statistics dump for each guild
     if (config.dumpStatistics.enabled) {
-      // Build statistics dump for each guild
-      stats[guildId] = {
-        Date: formatDate(new Date()),
-        Guild: guild.name,
-        Members: memberCount,
-        Bots: botCount,
-        Roles: roleCount,
-        Channels: channelCount,
-      };
-      const roleChannelIds = Object.keys(roleStats);
-      for (const roleChannelId of roleChannelIds) {
-        const roleStat = roleStats[roleChannelId];
-        stats[guildId][roleStat.text] = roleStat.count;
-      }
+      stats[guildId] = await buildStatistics(guild, counts, reset);
     }
 
     //const category = await getOrCreateCategory(guild, config.servers[guildId].category?.name);
@@ -181,6 +214,7 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
   
   log(`[${guild.name}] [${channelId}] Channel name changed, updating from '${channel.name}' to '${newName}'.`);
   await channel.setName(newName, 'update channel name');
+
   await sleep(config.sleepBetweenChannels);
 
   return true;
