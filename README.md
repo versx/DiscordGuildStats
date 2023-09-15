@@ -32,7 +32,6 @@ Displays Discord Guild statistics for members, bots, roles, channels, assigned m
 1. Copy example config `cp src/config.example.json src/config.json`  
 1. Fill out config options.  
 1. Build in root project folder (same folder `src`, `build`, etc are in): `npm run build`  
-1. Copy config to build folder `cp src/config.json build/config.json`  
 1. Run `npm run start`  
 
 ## Updating  
