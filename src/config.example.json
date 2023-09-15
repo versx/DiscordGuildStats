@@ -11,6 +11,7 @@
       "banCountChannelId": "00000000000006",
       "eventCountChannelId": "00000000000007",
       "reactionCountChannelId": "00000000000008",
+      "stickerCountChannelId": "00000000000009",
       "memberRoles": {
         "<DISCORD_ROLE_CHANNEL1_ID>": {
           "roleIds": ["<DISCORD_ROLE1_ID>"],

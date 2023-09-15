@@ -64,6 +64,7 @@ export const updateGuildStats = async (client: Client, reset: boolean) => {
       await guild.invites.fetch();
       await guild.bans.fetch();
       await guild.emojis.fetch();
+      await guild.stickers.fetch();
       await guild.scheduledEvents.fetch();
     }
 
@@ -75,6 +76,7 @@ export const updateGuildStats = async (client: Client, reset: boolean) => {
     const banCount = reset ? 0 : guild.bans.cache.size;
     const scheduledEventCount = reset ? 0 : guild.scheduledEvents.cache.size;
     const reactionCount = reset ? 0 : guild.emojis.cache.filter(emoji => !emoji.managed).size;
+    const stickerCount = reset ? 0 : guild.stickers.cache.size;
 
     let updated = false;
     // TODO: Voice Channels/Text Channels count
@@ -114,14 +116,20 @@ export const updateGuildStats = async (client: Client, reset: boolean) => {
         await sleep(SleepBetweenChannels);
       }
     }
+    if (guildConfig.eventCountChannelId) {
+      if (await updateChannelName(guild, guildConfig.eventCountChannelId, `Scheduled Events: ${scheduledEventCount.toLocaleString()}`)) {
+        updated = true;
+        await sleep(SleepBetweenChannels);
+      }
+    }
     if (guildConfig.reactionCountChannelId) {
       if (await updateChannelName(guild, guildConfig.reactionCountChannelId, `Reactions: ${reactionCount.toLocaleString()}`)) {
         updated = true;
         await sleep(SleepBetweenChannels);
       }
     }
-    if (guildConfig.eventCountChannelId) {
-      if (await updateChannelName(guild, guildConfig.eventCountChannelId, `Scheduled Events: ${scheduledEventCount.toLocaleString()}`)) {
+    if (guildConfig.stickerCountChannelId) {
+      if (await updateChannelName(guild, guildConfig.stickerCountChannelId, `Stickers: ${stickerCount.toLocaleString()}`)) {
         updated = true;
         await sleep(SleepBetweenChannels);
       }

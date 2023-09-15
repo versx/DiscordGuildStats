@@ -40,6 +40,7 @@ export type DiscordGuildConfig = {
   banCountChannelId: Snowflake | null;
   eventCountChannelId: Snowflake | null;
   reactionCountChannelId: Snowflake | null;
+  stickerCountChannelId: Snowflake | null;
   memberRoles: {
     [roleId: Snowflake]: DiscordMemberRolesConfig;
   };
