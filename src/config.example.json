@@ -1,5 +1,6 @@
 {
   "updateIntervalM": 15,
+  "dumpStatistics": false,
   "servers": {
     "<DISCORD_GUILD1_ID>": {
       "name": "<DESCRIPTIVE_NAME>",

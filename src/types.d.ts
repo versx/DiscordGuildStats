@@ -25,6 +25,7 @@ export interface BotEvent {
 
 export type GuildStatsConfig = {
   updateIntervalM: number;
+  dumpStatistics: boolean;
   servers: {
     [guildId: Snowflake]: DiscordGuildConfig;
   };
@@ -54,6 +55,16 @@ export type DiscordCategoryConfig = {
   name: string;
   stats: StatType[];
   displayIndex: number;
+};
+
+export type RoleStatistics = {
+  [channelId: Snowflake]: RoleStatistic;
+};
+
+export type RoleStatistic = {
+  text: string;
+  name: string;
+  count: number;
 };
 
 export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'memberRoles';

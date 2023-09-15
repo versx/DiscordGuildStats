@@ -5,9 +5,9 @@ import {
   Snowflake,
 } from 'discord.js';
 
-import { color, getTime, isAlreadyUpdated, sleep } from '.';
+import { color, dumpStatistics, getTime, isAlreadyUpdated, sleep } from '.';
 import { lastUpdated } from '../data';
-import { GuildStatsConfig } from '../types';
+import { GuildStatsConfig, RoleStatistics } from '../types';
 const config: GuildStatsConfig = require('../config.json');
 
 const SleepBetweenGuilds = 5; // 5
@@ -52,22 +52,33 @@ export const updateGuildStats = async (client: Client, reset: boolean) => {
     console.log(`${color('text', `Checking guild ${color('variable', guild.name)} for updates...`)}`);
 
     const members = await guild.members.fetch();
-    const memberCount = reset ? 0 : guild.memberCount.toLocaleString();
+    const memberCount = reset ? 0 : guild.memberCount;
     //const botCount = reset ? 0 : guild.members.cache.filter(member => !!member.user.bot).size.toLocaleString();
-    const botCount = reset ? 0 : members.filter(member => !!member.user.bot).size.toLocaleString();
-    const roleCount = reset ? 0 : guild.roles.cache.size.toLocaleString();
-    const channelCount = reset ? 0 : guild.channels.cache.size.toLocaleString();
+    const botCount = reset ? 0 : members.filter(member => !!member.user.bot).size;
+    const roleCount = reset ? 0 : guild.roles.cache.size;
+    const channelCount = reset ? 0 : guild.channels.cache.size;
 
     // TODO: Voice Channels/Text Channels count
-    await updateChannelName(guild, guildConfig.memberCountChannelId, `Members: ${memberCount}`);
-    await updateChannelName(guild, guildConfig.botCountChannelId, `Bots: ${botCount}`);
-    await updateChannelName(guild, guildConfig.roleCountChannelId, `Roles: ${roleCount}`);
-    await updateChannelName(guild, guildConfig.channelCountChannelId, `Channels: ${channelCount}`);
-    await getGuildMemberRoleCounts(guild, reset);
+    await updateChannelName(guild, guildConfig.memberCountChannelId, `Members: ${memberCount.toLocaleString()}`);
+    await updateChannelName(guild, guildConfig.botCountChannelId, `Bots: ${botCount.toLocaleString()}`);
+    await updateChannelName(guild, guildConfig.roleCountChannelId, `Roles: ${roleCount.toLocaleString()}`);
+    await updateChannelName(guild, guildConfig.channelCountChannelId, `Channels: ${channelCount.toLocaleString()}`);
+
+    const roleStats = await getGuildMemberRoleCounts(guild, reset);
+    const roleChannelIds = Object.keys(roleStats);
+    for (const roleChannelId of roleChannelIds) {
+      const roleStat = roleStats[roleChannelId];
+      await updateChannelName(guild, roleChannelId, roleStat.name);
+    }
 
     console.log(`${color('text', `Updated guild ${color('variable', guild.name)} channel names...`)}`);
 
     lastUpdated[guildId] = getTime();
+
+    if (config.dumpStatistics) {
+      // Dump guild statistics
+      dumpStatistics(memberCount, botCount, roleCount, channelCount, roleStats);
+    }
 
     // Wait 5 seconds between each guild update
     await sleep(SleepBetweenGuilds * 1000);
@@ -93,12 +104,13 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
   await sleep(SleepBetweenChannels * 1000);
 };
 
-export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean) => {
+export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean): Promise<RoleStatistics> => {
   const guildConfig = config.servers[guild.id];
   if (!guildConfig.memberRoles) {
-    return;
+    return {};
   }
 
+  const roles: RoleStatistics = {};
   const memberRoles = guildConfig.memberRoles;
   for (const roleChannelId of Object.keys(memberRoles)) {
     await sleep(250);
@@ -113,8 +125,10 @@ export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean) => 
     const members = await guild.members.fetch();
     const count = reset ? 0 : members.filter((member) => hasRole(member, roleIds)).size;
     const newName = `${text}: ${count.toLocaleString()}`;
-    await updateChannelName(guild, roleChannelId, newName);
+    roles[roleChannelId] = { name: newName, count, text };
+    //await updateChannelName(guild, roleChannelId, newName);
   }
+  return roles;
 };
 
 export const hasRole = (member: GuildMember, roleIds: Snowflake[]) => {
