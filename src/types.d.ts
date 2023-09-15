@@ -31,8 +31,6 @@ export type GuildStatsConfig = {
 };
 
 export type DiscordGuildConfig = {
-  ownerId: Snowflake;
-  guildId: Snowflake;
   memberCountChannelId: Snowflake;
   botCountChannelId: Snowflake;
   roleCountChannelId: Snowflake;
@@ -43,7 +41,7 @@ export type DiscordGuildConfig = {
   token: string;
   status?: string | null;
 
-  category: DiscordCategoryConfig;
+  category?: DiscordCategoryConfig;
 };
 
 export type DiscordMemberRolesConfig = {
