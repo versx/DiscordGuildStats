@@ -26,33 +26,34 @@ export const startUpdate = async (client: Client) => {
     }
 
     console.log(`${color('text', `Updating guild ${color('variable', guild.name)}`)}`);
-    const category = await getOrCreateCategory(guild, config.servers[guildId]);
-    await updateGuildStats(guild, category);
+    //const category = await getOrCreateCategory(guild, config.servers[guildId]);
+    //await updateGuildStats(guild, category);
+    await updateGuildStats(guild);
     await sleep(5 * 1000); // Wait 5 seconds between each update
   }
 };
 
-export const getOrCreateCategory = async (guild: Guild, guildConfig: DiscordGuildConfig) => {
-  let category = guild.channels.cache.find((category) => category.type === ChannelType.GuildCategory && category.name === guildConfig.category.name);
-  console.log('category:', category);
-  if (!category) {
-    category = await guild.channels.create({
-      name: guildConfig.category.name,
-      type: ChannelType.GuildCategory,
-      //topic: '',
-      position: 1,
-      permissionOverwrites: [{
-        allow: ['ViewChannel'],
-        deny: ['Connect'],
-        id: guild.id,
-        type: OverwriteType.Role,
-      }],
-    });
-  }
-  return category;
-};
+//export const getOrCreateCategory = async (guild: Guild, guildConfig: DiscordGuildConfig) => {
+//  let category = guild.channels.cache.find((category) => category.type === ChannelType.GuildCategory && category.name === guildConfig.category.name);
+//  console.log('category:', category);
+//  if (!category) {
+//    category = await guild.channels.create({
+//      name: guildConfig.category?.name!,
+//      type: ChannelType.GuildCategory,
+//      //topic: '',
+//      position: 1,
+//      permissionOverwrites: [{
+//        allow: ['ViewChannel'],
+//        deny: ['Connect'],
+//        id: guild.id,
+//        type: OverwriteType.Role,
+//      }],
+//    });
+//  }
+//  return category;
+//};
 
-export const updateGuildStats = async (guild: Guild, category: GuildBasedChannel) => {
+export const updateGuildStats = async (guild: Guild) => {
   const guildConfig = config.servers[guild.id];
   if (guildConfig.status) {
     guild.client.user?.setActivity('Generating statistics...');
