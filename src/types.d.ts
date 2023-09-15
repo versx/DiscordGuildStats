@@ -23,7 +23,7 @@ export interface BotEvent {
   execute: (...args?) => void,
 };
 
-export type GuildStatsConfig = {
+export type DiscordGuildStatsConfig = {
   servers: {
     [guildId: Snowflake]: DiscordGuildConfig;
   };

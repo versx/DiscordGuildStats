@@ -1,8 +1,8 @@
 import { Client } from 'discord.js';
 
+import config from '../config.json';
 import { color, log, updateGuilds } from '../services';
-import { BotEvent, GuildStatsConfig } from '../types';
-const config: GuildStatsConfig = require('../config.json');
+import { BotEvent } from '../types';
 
 const event: BotEvent = {
   name: 'ready',

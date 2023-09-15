@@ -13,10 +13,10 @@ import {
   log, logDebug, logError, logWarn,
   sleep,
 } from '.';
-import { DiscordGuildConfig, GuildStatsConfig } from '../types';
-const config: GuildStatsConfig = require('../config.json');
+import { DiscordGuildConfig, DiscordGuildStatsConfig } from '../types';
 
-export let lastUpdated: { [guildId: Snowflake]: number } = {};
+const config: DiscordGuildStatsConfig = require('../config.json');
+let lastUpdated: { [guildId: Snowflake]: number } = {};
 
 export const updateGuilds = async (client: Client, reset: boolean) => {
   const guilds = client.guilds.cache.filter((guild) => !!config.servers[guild.id]);
@@ -25,23 +25,24 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
     return;
   }
 
-  for (const [guildId, guild] of guilds) {
-    const lastUpdate = lastUpdated[guildId];
-    if (isAlreadyUpdated(lastUpdate, config.updateIntervalM)) {
+  const guildIds = Object.keys(config.servers);
+  for (const guildId of guildIds) {
+    const guild = guilds.get(guildId);
+    const guildConfig = config.servers[guildId];
+    if (!guild) {
+      console.warn(`[${guildConfig.name}] Failed to get guild with id: ${guildId}`);
+      continue;
+    }
+
+    // Check if guild statistics have been updated recently
+    if (isAlreadyUpdated(lastUpdated[guildId], config.updateIntervalM)) {
       logDebug(`[${guild.name}] Guild already updated within ${config.updateIntervalM} minutes, skipping...`);
       continue;
     }
 
-    //const category = await getOrCreateCategory(guild, config.servers[guildId]);
-    const guildConfig = config.servers[guildId];
-    if (!guildConfig) {
-      logWarn(`[${guild.name}] Failed to get guild config.`);
-      continue;
-    }
-
     log(`[${guild.name}] ${color('text', `Checking guild ${color('variable', guild.name)} for updates...`)}`);
-
     if (!reset) {
+      // Fetch all Discord objects
       await guild.fetch();
       await guild.members.fetch();
       await guild.roles.fetch();
@@ -53,9 +54,11 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
       await guild.scheduledEvents.fetch();
     }
 
+    //const category = await getOrCreateCategory(guild, config.servers[guildId].category?.name);
     if (await updateGuildStats(guild, guildConfig, reset)) {
       log(`[${guild.name}] ${color('text', `Updated guild ${color('variable', guild.name)} channel names...`)}`);
 
+      // Set time of last update for guild
       lastUpdated[guildId] = getTime();
 
       // Wait 5 seconds between each guild update
@@ -187,11 +190,11 @@ export const hasRole = (member: GuildMember, roleIds: Snowflake[]) => {
   return count;
 };
 
-//export const getOrCreateCategory = async (guild: Guild, guildConfig: DiscordGuildConfig) => {
+//export const getOrCreateCategory = async (guild: Guild, categoryName: string) => {
 //  let category = guild.channels.cache.find((category) => category.type === ChannelType.GuildCategory && category.name === guildConfig.category.name);
 //  if (!category) {
 //    category = await guild.channels.create({
-//      name: guildConfig.category?.name!,
+//      name: categoryName,
 //      type: ChannelType.GuildCategory,
 //      //topic: '',
 //      position: 1,
