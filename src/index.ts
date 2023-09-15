@@ -1,8 +1,8 @@
-import { Client, GatewayIntentBits, Collection } from 'discord.js';
+import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
 
-import { startUpdate } from './services';
+import { updateGuildStats } from './services';
 import { GuildStatsConfig } from './types';
 
 const config: GuildStatsConfig = require('./config.json');
@@ -37,6 +37,6 @@ setInterval(async () => {
     if (!client.isReady()) {
       continue;
     }
-    await startUpdate(client);
+    await updateGuildStats(client, false);
   }
 }, config.updateIntervalM * 60 * 1000);

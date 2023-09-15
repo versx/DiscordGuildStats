@@ -1,6 +1,6 @@
 import { Client } from 'discord.js';
 
-import { color, resetChannelNames, startUpdate } from '../services';
+import { color, updateGuildStats } from '../services';
 import { BotEvent } from '../types';
 
 const event: BotEvent = {
@@ -9,9 +9,7 @@ const event: BotEvent = {
   execute: async (client: Client) => {
     console.log(color('text', `💪 Logged in as ${color('variable', client.user?.tag)}`));
     console.log(color('text', `Bot has started, with ${color('variable', client.users.cache.size)} users, in ${color('variable', client.channels.cache.size)} channels of ${color('variable', client.guilds.cache.size)} guilds.`));
-
-    //await resetChannelNames(client);
-    await startUpdate(client);
+    await updateGuildStats(client, false);
   },
 };
 
