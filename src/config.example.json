@@ -1,8 +1,11 @@
 {
   "dumpStatistics": {
     "enabled": false,
-    "data": ["members", "bots", "roles", "channels", "invites", "bans", "reactions", "stickers", "scheduledEvents", "memberRoles"],
-    "dateFormat": "{year}-{month}-{day}",
+    "data": [
+      "members", "bots", "roles", "channels",
+      "invites", "bans", "reactions", "stickers",
+      "scheduledEvents", "memberRoles"
+    ],
     "fileName": "dumps.csv"
   },
   "logLevel": "info",

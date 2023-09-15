@@ -214,7 +214,6 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
   
   log(`[${guild.name}] [${channelId}] Channel name changed, updating from '${channel.name}' to '${newName}'.`);
   await channel.setName(newName, 'update channel name');
-
   await sleep(config.sleepBetweenChannels);
 
   return true;
