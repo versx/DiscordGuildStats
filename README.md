@@ -13,6 +13,10 @@ Displays Discord Guild statistics for members, bots, roles, channels, and role c
   * Bot counts  
   * Role counts  
   * Channel counts  
+  * Invite counts
+  * Reaction counts
+  * Scheduled event counts
+  * Ban counts
   * Assigned member role counts  
 - Automatically updates every specified minutes  
 
