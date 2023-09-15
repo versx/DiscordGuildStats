@@ -31,6 +31,7 @@ export type GuildStatsConfig = {
 };
 
 export type DiscordGuildConfig = {
+  name: string;
   memberCountChannelId: Snowflake;
   botCountChannelId: Snowflake;
   roleCountChannelId: Snowflake;

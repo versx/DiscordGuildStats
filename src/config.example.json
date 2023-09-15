@@ -2,6 +2,7 @@
   "updateIntervalM": 15,
   "servers": {
     "<DISCORD_GUILD1_ID>": {
+      "name": "<DESCRIPTIVE_NAME>",
       "memberCountChannelId": "00000000000001",
       "botCountChannelId": "00000000000002",
       "roleCountChannelId": "00000000000003",

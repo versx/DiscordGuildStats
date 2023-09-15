@@ -12,6 +12,28 @@ const config: GuildStatsConfig = require('../config.json');
 const SleepBetweenGuilds = 5;
 const SleepBetweenChannels = 1;
 
+export const resetChannelNames = async (client: Client) => {
+  const guilds = client.guilds.cache.filter((guild) => !!config.servers[guild.id]);
+  if (guilds.size === 0) {
+    console.warn('no guilds available, skipping ready initialization...');
+    return;
+  }
+
+  for (const [guildId, guild] of guilds) {
+    const guildConfig = config.servers[guildId];
+    if (!guildConfig) {
+      //console.warn('resetChannelNames: failed to get guild config for guild with id:', guildId);
+      continue;
+    }
+    await updateChannelName(guild, guildConfig.memberCountChannelId, `Member Count: 0`);
+    await updateChannelName(guild, guildConfig.botCountChannelId, `Bot Count: 0`);
+    await updateChannelName(guild, guildConfig.roleCountChannelId, `Role Count: 0`);
+    await updateChannelName(guild, guildConfig.channelCountChannelId, `Channel Count: 0`);
+    // Wait 5 seconds between each guild update
+    await sleep(SleepBetweenGuilds * 1000);
+  }
+};
+
 export const startUpdate = async (client: Client) => {
   const guilds = client.guilds.cache.filter((guild) => !!config.servers[guild.id]);
   if (guilds.size === 0) {
@@ -58,7 +80,7 @@ export const startUpdate = async (client: Client) => {
 export const updateGuildStats = async (guild: Guild) => {
   const guildConfig = config.servers[guild.id];
   if (guildConfig.status) {
-    guild.client.user?.setActivity('Generating statistics...');
+    guild.client.user?.setActivity(guildConfig.status);
   }
 
   // Fetch full list of members so bots are included
