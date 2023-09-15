@@ -12,9 +12,3 @@ const event: BotEvent = {
 };
 
 export default event;
-
-// TODO: Invites
-// TODO: Bans
-// TODO: Events
-// TODO: Threads
-// TODO: Reactions

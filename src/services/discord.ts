@@ -51,23 +51,51 @@ export const updateGuildStats = async (client: Client, reset: boolean) => {
 
     console.log(`${color('text', `Checking guild ${color('variable', guild.name)} for updates...`)}`);
 
-    const members = await guild.members.fetch();
-    const memberCount = reset ? 0 : guild.memberCount.toLocaleString();
+    const memberCount = reset ? 0 : guild.memberCount;
     //const botCount = reset ? 0 : guild.members.cache.filter(member => !!member.user.bot).size.toLocaleString();
-    const botCount = reset ? 0 : members.filter(member => !!member.user.bot).size.toLocaleString();
-    const roleCount = reset ? 0 : guild.roles.cache.size.toLocaleString();
-    const channelCount = reset ? 0 : guild.channels.cache.size.toLocaleString();
+    const botCount = reset ? 0 : (await guild.members.fetch()).filter(member => !!member.user.bot).size;
+    //const roleCount = reset ? 0 : guild.roles.cache.size.toLocaleString();
+    //const roles = reset ? 0 : await guild.roles.fetch();//.cache.size.toLocaleString();
+    const roleCount = reset ? 0 : (await guild.roles.fetch()).size;//.cache.size.toLocaleString();
+    const channelCount = reset ? 0 : guild.channels.cache.size;
+    //const inviteCount = reset ? 0 : guild.invites.cache.size.toLocaleString();
+    const inviteCount = reset ? 0 : (await guild.invites.fetch()).size;
+    //const banCount = reset ? 0 : guild.bans.cache.size;
+    const banCount = reset ? 0 : (await guild.bans.fetch()).size;
+    const scheduledEventCount = reset ? 0 : (await guild.scheduledEvents.fetch()).size;
+    const reactionCount = reset ? 0 : (await guild.emojis.fetch()).size;
 
     // TODO: Voice Channels/Text Channels count
-    await updateChannelName(guild, guildConfig.memberCountChannelId, `Members: ${memberCount}`);
-    await updateChannelName(guild, guildConfig.botCountChannelId, `Bots: ${botCount}`);
-    await updateChannelName(guild, guildConfig.roleCountChannelId, `Roles: ${roleCount}`);
-    await updateChannelName(guild, guildConfig.channelCountChannelId, `Channels: ${channelCount}`);
-    await getGuildMemberRoleCounts(guild, reset);
-
-    console.log(`${color('text', `Updated guild ${color('variable', guild.name)} channel names...`)}`);
+    if (guildConfig.memberCountChannelId) {
+      await updateChannelName(guild, guildConfig.memberCountChannelId, `Members: ${memberCount.toLocaleString()}`);
+    }
+    if (guildConfig.botCountChannelId) {
+      await updateChannelName(guild, guildConfig.botCountChannelId, `Bots: ${botCount.toLocaleString()}`);
+    }
+    if (guildConfig.roleCountChannelId) {
+      await updateChannelName(guild, guildConfig.roleCountChannelId, `Roles: ${roleCount.toLocaleString()}`);
+    }
+    if (guildConfig.channelCountChannelId) {
+      await updateChannelName(guild, guildConfig.channelCountChannelId, `Channels: ${channelCount.toLocaleString()}`);
+    }
+    if (guildConfig.inviteCountChannelId) {
+      await updateChannelName(guild, guildConfig.inviteCountChannelId, `Invites: ${inviteCount.toLocaleString()}`);
+    }
+    if (guildConfig.banCountChannelId) {
+      await updateChannelName(guild, guildConfig.banCountChannelId, `Bans: ${banCount.toLocaleString()}`);
+    }
+    if (guildConfig.eventCountChannelId) {
+      await updateChannelName(guild, guildConfig.eventCountChannelId, `Scheduled Events: ${scheduledEventCount.toLocaleString()}`);
+    }
+    if (guildConfig.reactionCountChannelId) {
+      await updateChannelName(guild, guildConfig.reactionCountChannelId, `Reactions: ${reactionCount.toLocaleString()}`);
+    }
+    if (guildConfig.memberRoles) {
+      await getGuildMemberRoleCounts(guild, reset);
+    }
 
     lastUpdated[guildId] = getTime();
+    console.log(`${color('text', `Updated guild ${color('variable', guild.name)} channel names...`)}`);
 
     // Wait 5 seconds between each guild update
     await sleep(SleepBetweenGuilds * 1000);

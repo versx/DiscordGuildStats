@@ -34,3 +34,6 @@ Displays Discord Guild statistics for members, bots, roles, channels, and role c
 
 ## Preview  
 ![Image Preview](https://raw.githubusercontent.com/versx/GuildStats/master/example.png)  
+
+## Notes  
+- Not specifying a channel ID (i.e. `null`) for a statistics count in the config will omit that statistic from being updated.  

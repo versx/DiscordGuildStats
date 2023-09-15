@@ -32,10 +32,14 @@ export type GuildStatsConfig = {
 
 export type DiscordGuildConfig = {
   name?: string;
-  memberCountChannelId: Snowflake;
-  botCountChannelId: Snowflake;
-  roleCountChannelId: Snowflake;
-  channelCountChannelId: Snowflake;
+  memberCountChannelId: Snowflake | null;
+  botCountChannelId: Snowflake | null;
+  roleCountChannelId: Snowflake | null;
+  channelCountChannelId: Snowflake | null;
+  inviteCountChannelId: Snowflake | null;
+  banCountChannelId: Snowflake | null;
+  eventCountChannelId: Snowflake | null;
+  reactionCountChannelId: Snowflake | null;
   memberRoles: {
     [roleId: Snowflake]: DiscordMemberRolesConfig;
   };
@@ -56,6 +60,6 @@ export type DiscordCategoryConfig = {
   displayIndex: number;
 };
 
-export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'memberRoles';
+export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'memberRoles' | 'invites' | 'bans';
 
 export type ColorType = 'text' | 'variable' | 'error';
