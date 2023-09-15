@@ -1,5 +1,4 @@
 {
-  "updateIntervalM": 15,
   "servers": {
     "<DISCORD_GUILD1_ID>": {
       "name": "<DESCRIPTIVE_NAME>",
@@ -21,9 +20,12 @@
           "roleIds": ["<DISCORD_ROLE2_ID>"],
           "text": "Supporters"
         }
-      },
-      "token": "<DISCORD_BOT_TOKEN>",
-      "status": null
+      }
     }
-  }
+  },
+  "sleepBetweenChannels": 250,
+  "sleepBetweenGuilds": 3000,
+  "status": null,
+  "token": "<DISCORD_BOT_TOKEN>",
+  "updateIntervalM": 15
 }

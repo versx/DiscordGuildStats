@@ -1,4 +1,5 @@
 import {
+  ChannelType,
   Client,
   Guild,
   GuildMember,
@@ -15,9 +16,6 @@ import {
 import { GuildStatsConfig } from '../types';
 const config: GuildStatsConfig = require('../config.json');
 
-const SleepBetweenGuilds = 5; // 5
-const SleepBetweenChannels = 250; // 2
-
 export let lastUpdated: { [guildId: Snowflake]: number } = {};
 
 export const updateGuildStats = async (client: Client, reset: boolean) => {
@@ -25,6 +23,19 @@ export const updateGuildStats = async (client: Client, reset: boolean) => {
   if (guilds.size === 0) {
     logError(`[${client.user?.id}] Bot is not in any guilds, skipping...`);
     return;
+  }
+
+  if (config?.status) {
+    client.user?.setActivity(config.status);
+    //guild.client.user?.setPresence({
+    //  status: 'online',
+    //  afk: false,
+    //  activities: [{
+    //    name: config.status,
+    //    url: 'https://www.twitch.tv/versx',
+    //    type: ActivityType.Streaming,
+    //  }],
+    //});
   }
 
   for (const [guildId, guild] of guilds) {
@@ -39,19 +50,6 @@ export const updateGuildStats = async (client: Client, reset: boolean) => {
     if (!guildConfig) {
       logWarn(`[${guild.name}] Failed to get guild config.`);
       continue;
-    }
-
-    if (guildConfig?.status) {
-      guild.client.user?.setActivity(guildConfig.status);
-      //guild.client.user?.setPresence({
-      //  status: 'online',
-      //  afk: false,
-      //  activities: [{
-      //    name: 'TEST STATUS',
-      //    url: 'https://www.twitch.tv/versx',
-      //    type: ActivityType.Streaming,
-      //  }],
-      //});
     }
 
     log(`[${guild.name}] ${color('text', `Checking guild ${color('variable', guild.name)} for updates...`)}`);
@@ -78,65 +76,67 @@ export const updateGuildStats = async (client: Client, reset: boolean) => {
     const reactionCount = reset ? 0 : guild.emojis.cache.filter(emoji => !emoji.managed).size;
     const stickerCount = reset ? 0 : guild.stickers.cache.size;
 
+    // TODO: const textChannelCount = reset ? 0 : guild.channels.cache.filter(channel => channel.type === ChannelType.GuildText).size;
+    // TODO: const voiceChannelCount = reset ? 0 : guild.channels.cache.filter(channel => channel.type === ChannelType.GuildVoice).size;
+
     let updated = false;
-    // TODO: Voice Channels/Text Channels count
     if (guildConfig.memberCountChannelId) {
       if (await updateChannelName(guild, guildConfig.memberCountChannelId, `Members: ${memberCount.toLocaleString()}`)) {
         updated = true;
-        await sleep(SleepBetweenChannels);
+        await sleep(config.sleepBetweenChannels);
       }
     }
     if (guildConfig.botCountChannelId) {
       if (await updateChannelName(guild, guildConfig.botCountChannelId, `Bots: ${botCount.toLocaleString()}`)) {
         updated = true;
-        await sleep(SleepBetweenChannels);
+        await sleep(config.sleepBetweenChannels);
       }
     }
     if (guildConfig.roleCountChannelId) {
       if (await updateChannelName(guild, guildConfig.roleCountChannelId, `Roles: ${roleCount.toLocaleString()}`)) {
         updated = true;
-        await sleep(SleepBetweenChannels);
+        await sleep(config.sleepBetweenChannels);
       }
     }
     if (guildConfig.channelCountChannelId) {
       if (await updateChannelName(guild, guildConfig.channelCountChannelId, `Channels: ${channelCount.toLocaleString()}`)) {
         updated = true;
-        await sleep(SleepBetweenChannels);
+        await sleep(config.sleepBetweenChannels);
       }
     }
     if (guildConfig.inviteCountChannelId) {
       if (await updateChannelName(guild, guildConfig.inviteCountChannelId, `Invites: ${inviteCount.toLocaleString()}`)) {
         updated = true;
-        await sleep(SleepBetweenChannels);
+        await sleep(config.sleepBetweenChannels);
       }
     }
     if (guildConfig.banCountChannelId) {
       if (await updateChannelName(guild, guildConfig.banCountChannelId, `Bans: ${banCount.toLocaleString()}`)) {
         updated = true;
-        await sleep(SleepBetweenChannels);
+        await sleep(config.sleepBetweenChannels);
       }
     }
     if (guildConfig.eventCountChannelId) {
       if (await updateChannelName(guild, guildConfig.eventCountChannelId, `Scheduled Events: ${scheduledEventCount.toLocaleString()}`)) {
         updated = true;
-        await sleep(SleepBetweenChannels);
+        await sleep(config.sleepBetweenChannels);
       }
     }
     if (guildConfig.reactionCountChannelId) {
       if (await updateChannelName(guild, guildConfig.reactionCountChannelId, `Reactions: ${reactionCount.toLocaleString()}`)) {
         updated = true;
-        await sleep(SleepBetweenChannels);
+        await sleep(config.sleepBetweenChannels);
       }
     }
     if (guildConfig.stickerCountChannelId) {
       if (await updateChannelName(guild, guildConfig.stickerCountChannelId, `Stickers: ${stickerCount.toLocaleString()}`)) {
         updated = true;
-        await sleep(SleepBetweenChannels);
+        await sleep(config.sleepBetweenChannels);
       }
     }
     if (guildConfig.memberRoles) {
       await getGuildMemberRoleCounts(guild, reset);
-      await sleep(SleepBetweenChannels);
+      await sleep(config.sleepBetweenChannels);
     }
 
     lastUpdated[guildId] = getTime();
@@ -144,7 +144,7 @@ export const updateGuildStats = async (client: Client, reset: boolean) => {
       log(`[${guild.name}] ${color('text', `Updated guild ${color('variable', guild.name)} channel names...`)}`);
 
       // Wait 5 seconds between each guild update
-      await sleep(SleepBetweenGuilds * 1000);
+      await sleep(config.sleepBetweenGuilds);
     }
   }
 };

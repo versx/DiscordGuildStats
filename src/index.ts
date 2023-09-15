@@ -6,7 +6,6 @@ import { updateGuildStats } from './services';
 import { GuildStatsConfig } from './types';
 
 const config: GuildStatsConfig = require('./config.json');
-const clients: Client[] = [];
 
 const loadHandlers = (client: Client) => {
   const handlersDir = join(__dirname, './handlers');
@@ -32,22 +31,9 @@ const intents = [
   GuildVoiceStates,
 ];
 
-for (const guildId in config.servers) {
-  const client = new Client({intents});
-  client.cooldowns = new Collection<string, number>();
+const client = new Client({intents});
+client.cooldowns = new Collection<string, number>();
+loadHandlers(client);
+client.login(config.token);
 
-  loadHandlers(client);
-
-  const guildConfig = config.servers[guildId];
-  client.login(guildConfig.token);
-  clients.push(client);
-}
-
-setInterval(async () => {
-  for (const client of clients) {
-    if (!client.isReady()) {
-      continue;
-    }
-    await updateGuildStats(client, false);
-  }
-}, config.updateIntervalM * 60 * 1000);
+setInterval(async () => await updateGuildStats(client, false), config.updateIntervalM * 60 * 1000);

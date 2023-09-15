@@ -24,10 +24,14 @@ export interface BotEvent {
 };
 
 export type GuildStatsConfig = {
-  updateIntervalM: number;
   servers: {
     [guildId: Snowflake]: DiscordGuildConfig;
   };
+  sleepBetweenGuilds: number;
+  sleepBetweenChannels: number;
+  status?: string | null;
+  token: string;
+  updateIntervalM: number;
 };
 
 export type DiscordGuildConfig = {
@@ -44,10 +48,7 @@ export type DiscordGuildConfig = {
   memberRoles: {
     [roleId: Snowflake]: DiscordMemberRolesConfig;
   };
-  token: string;
-  status?: string | null;
-
-  category?: DiscordCategoryConfig;
+  //category?: DiscordCategoryConfig;
 };
 
 export type DiscordMemberRolesConfig = {
