@@ -3,4 +3,4 @@ build
 .env
 .vscode
 config.json
-dumps/*
+dumps/**
