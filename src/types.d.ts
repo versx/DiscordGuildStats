@@ -73,6 +73,12 @@ export type RoleStatistic = {
   count: number;
 };
 
+export type DumpStats = {
+  [guildName: string]: {
+    [column: string]: string | number;
+  };
+};
+
 export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'memberRoles' | 'invites' | 'bans';
 
 export type ColorType = 'text' | 'variable' | 'error' | 'date';

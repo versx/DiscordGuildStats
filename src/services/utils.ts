@@ -1,8 +1,8 @@
 import chalk from 'chalk';
-import { appendFileSync, existsSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { ColorType, RoleStatistics } from '../types';
+import { ColorType, DumpStats } from '../types';
 
 const themeColors = {
   text: '#ff8e4d',
@@ -39,26 +39,40 @@ export const formatDate = (date: Date) => {
   return formattedDate;
 };
 
-export const dumpStatistics = (stats: number[], assignedRoles: RoleStatistics) => {  
+export const dumpStatistics = (stats: DumpStats) => {  
   const date = formatDate(new Date());
   const path = resolve(__dirname, `../../dumps/${date}.csv`);
-  const roleChannelIds = Object.keys(assignedRoles);
-  if (!existsSync(path)) {
-    let header = '[Members,Bots,Roles,Channels';
-    for (const roleChannelId of roleChannelIds) {
-      const role = assignedRoles[roleChannelId];
-      header += `,${role.text}`;
+
+  // Print column headers
+  let data = '[';
+  const guildIds = Object.keys(stats);
+  for (const guildId of guildIds) {
+    const guildStats = stats[guildId];
+    const headers = Object.keys(guildStats);
+    for (let i = 0; i < headers.length; i++) {
+      if (i !== 0) {
+        data += ',';
+      }
+      data += `${headers[i]}`;
     }
-    header += ']\n';
-    writeFileSync(path, header, { encoding: 'utf-8' });
+    data += ']\n';
+    break;
   }
 
-  //let data = `${members},${bots},${roles},${channels}`;
-  let data = stats.join(',');
-  for (const roleChannelId of roleChannelIds) {
-    const role = assignedRoles[roleChannelId];
-    data += `,${role.count}`;
+  for (const guildId of guildIds) {
+    const guildStats = stats[guildId];
+    const headers = Object.keys(guildStats);
+  
+    // Print column values
+    for (let i = 0; i < headers.length; i++) {
+      if (i !== 0) {
+        data += ',';
+      }
+      const header = headers[i];
+      const value = guildStats[header];
+      data += `${value}`;
+    }
+    data += '\n';
   }
-  data += '\n';
-  appendFileSync(path, data, { encoding: 'utf-8' });
+  writeFileSync(path, data, { encoding: 'utf-8' });
 };
