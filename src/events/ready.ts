@@ -1,16 +1,30 @@
 import { Client } from 'discord.js';
 
-import { color, updateGuildStats } from '../services';
+import config from '../config.json';
+import { color, log, updateGuilds } from '../services';
 import { BotEvent } from '../types';
 
 const event: BotEvent = {
   name: 'ready',
   once: true,
   execute: async (client: Client) => {
-    console.log(color('text', `💪 Logged in as ${color('variable', client.user?.tag)}\nBot has started, with ${color('variable', client.users.cache.size)} users, in ${color('variable', client.channels.cache.size)} channels of ${color('variable', client.guilds.cache.size)} guilds.`));
-    //console.log(color('text', `💪 Logged in as ${color('variable', client.user?.tag)}`));
-    //console.log(color('text', `Bot has started, with ${color('variable', client.users.cache.size)} users, in ${color('variable', client.channels.cache.size)} channels of ${color('variable', client.guilds.cache.size)} guilds.`));
-    await updateGuildStats(client, false);
+    log(color('text', `💪 Logged in as ${color('variable', client.user?.tag)}`));
+    log(color('text', `🤖 Bot has started, with ${color('variable', client.users.cache.size)} users, in ${color('variable', client.channels.cache.size)} channels of ${color('variable', client.guilds.cache.size)} guilds.`));
+
+    if (config?.status) {
+      client.user?.setActivity(config.status);
+      //client.user?.setPresence({
+      //  status: 'online',
+      //  afk: false,
+      //  activities: [{
+      //    name: config.status,
+      //    url: 'https://www.twitch.tv/versx',
+      //    type: ActivityType.Streaming,
+      //  }],
+      //});
+    }
+
+    await updateGuilds(client, false);
   },
 };
 
