@@ -46,3 +46,11 @@ Displays Discord Guild statistics for members, bots, roles, channels, assigned m
 ## Notes  
 - Not specifying a channel ID (i.e. `null`) for a statistics count in the config will omit that statistic from being updated.  
 - Not specifying a file name for the guild statistics dump will use the date (i.e. `2023-09-15.csv`) by default.  
+
+## Log Levels  
+- `trace` (Log everything)  
+- `debug` (Log debug, info, warnings, and errors)  
+- `info` (Log info, warnings, and errors)  
+- `warn` (Log only warnings and errors)  
+- `error` (Log only errors)  
+- `none` (Log nothing)  
