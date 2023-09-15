@@ -36,7 +36,7 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
 
     // Check if guild statistics have been updated recently
     if (isAlreadyUpdated(lastUpdated[guildId], config.updateIntervalM)) {
-      logDebug(`[${guild.name}] Guild already updated within ${config.updateIntervalM} minutes, skipping...`);
+      //logDebug(`[${guild.name}] Guild already updated within ${config.updateIntervalM} minutes, skipping...`);
       continue;
     }
 
