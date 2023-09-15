@@ -11,6 +11,8 @@ const themeColors = {
   error: '#f5426c',
 };
 
+const DefaultHeader = '[Column,Value]\n';
+
 export const color = (color: ColorType, message: any) => chalk.hex(themeColors[color])(message);
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -64,7 +66,7 @@ export const dumpGuildStatistics = (fileName: string, stats: DumpStats) => {
     return;
   }
 
-  writeFile(path, data, { encoding: 'utf-8' }, () => {
+  writeFile(path, DefaultHeader + data, { encoding: 'utf-8' }, () => {
     //logDebug(`Guild statistics dumped to ${path}`);
   });
 };
