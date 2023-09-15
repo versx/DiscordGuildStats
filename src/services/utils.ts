@@ -1,5 +1,4 @@
 import chalk from 'chalk';
-import { Snowflake } from 'discord.js';
 import { appendFileSync, existsSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -12,9 +11,7 @@ const themeColors = {
   error: '#f5426c',
 };
 
-export const color = (color: ColorType, message: any) => {
-  return chalk.hex(themeColors[color])(message);
-};
+export const color = (color: ColorType, message: any) => chalk.hex(themeColors[color])(message);
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -42,7 +39,7 @@ export const formatDate = (date: Date) => {
   return formattedDate;
 };
 
-export const dumpStatistics = (members: number, bots: number, roles: number, channels: number, assignedRoles: RoleStatistics) => {  
+export const dumpStatistics = (stats: number[], assignedRoles: RoleStatistics) => {  
   const date = formatDate(new Date());
   const path = resolve(__dirname, `../../dumps/${date}.csv`);
   const roleChannelIds = Object.keys(assignedRoles);
@@ -56,7 +53,8 @@ export const dumpStatistics = (members: number, bots: number, roles: number, cha
     writeFileSync(path, header, { encoding: 'utf-8' });
   }
 
-  let data = `${members},${bots},${roles},${channels}`;
+  //let data = `${members},${bots},${roles},${channels}`;
+  let data = stats.join(',');
   for (const roleChannelId of roleChannelIds) {
     const role = assignedRoles[roleChannelId];
     data += `,${role.count}`;
