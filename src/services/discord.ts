@@ -1,5 +1,4 @@
 import {
-  ChannelType,
   Client,
   Guild,
   GuildMember,
@@ -166,7 +165,7 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
   }
 
   if (channel.name === newName) {
-    logDebug(`[${guild.name}, ${channelId}] Channel name already set to '${newName}', skipping...`);
+    //logDebug(`[${guild.name}, ${channelId}] Channel name already set to '${newName}', skipping...`);
     return false;
   }
   
