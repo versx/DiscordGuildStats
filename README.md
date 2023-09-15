@@ -17,7 +17,7 @@ Displays Discord Guild statistics for members, bots, roles, channels, and role c
 - Automatically updates every specified minutes  
 
 ## Prerequisites
-- [Node.js v18 or higher](https://nodejs.org/en/download)  
+- [Node.js v16 or higher](https://nodejs.org/en/download)  
 
 ## Installation
 1. Clone repository: `git clone https://github.com/versx/DiscordGuildStats`  
