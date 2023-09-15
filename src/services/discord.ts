@@ -1,5 +1,4 @@
 import {
-  ChannelType,
   Client,
   Guild,
   GuildMember,
@@ -8,12 +7,13 @@ import {
 
 import {
   color,
+  dumpStatistics,
   getTime,
   isAlreadyUpdated,
   log, logDebug, logError, logWarn,
   sleep,
 } from '.';
-import { DiscordGuildConfig, DiscordGuildStatsConfig } from '../types';
+import { DiscordGuildConfig, DiscordGuildStatsConfig, RoleStatistics } from '../types';
 
 const config: DiscordGuildStatsConfig = require('../config.json');
 let lastUpdated: { [guildId: Snowflake]: number } = {};
@@ -140,19 +140,32 @@ export const updateGuildStats = async (guild: Guild, guildConfig: DiscordGuildCo
     await getGuildMemberRoleCounts(guild, reset);
     await sleep(config.sleepBetweenChannels);
   }
+  
+  const roleStats = await getGuildMemberRoleCounts(guild, reset);
+  const roleChannelIds = Object.keys(roleStats);
+  for (const roleChannelId of roleChannelIds) {
+    const roleStat = roleStats[roleChannelId];
+    await updateChannelName(guild, roleChannelId, roleStat.name);
+  }
+
+  if (config.dumpStatistics) {
+    logDebug(`[${guild.name}] Dumping guild statistics...`);
+    const stats = [memberCount, botCount, roleCount, channelCount];
+    dumpStatistics(stats, roleStats);
+  }
 
   return updated;
 };
 
 export const updateChannelName = async (guild: Guild, channelId: Snowflake, newName: string): Promise<boolean> => {
-  const channel = await guild.channels.fetch(channelId); //.cache.get(channelId);
+  const channel = guild.channels.cache.get(channelId);
   if (!channel) {
     logWarn(`[${guild.name}] [${channelId}] Failed to get channel.`);
     return false;
   }
 
   if (channel.name === newName) {
-    //debug(guild, channelId, `Channel name already set to '${newName}', skipping...`);
+    //logDebug(`[${guild.name}, ${channelId}] Channel name already set to '${newName}', skipping...`);
     return false;
   }
   
@@ -161,17 +174,18 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
   return true;
 };
 
-export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean) => {
+export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean): Promise<RoleStatistics> => {
   const guildConfig = config.servers[guild.id];
   if (!guildConfig.memberRoles) {
-    return;
+    return {};
   }
 
+  const roles: RoleStatistics = {};
   const memberRoles = guildConfig.memberRoles;
   for (const roleChannelId of Object.keys(memberRoles)) {
     await sleep(250);
 
-    const channel = await guild.channels.fetch(roleChannelId);
+    const channel = guild.channels.cache.get(roleChannelId);
     if (!channel) {
       logWarn(`[${guild.name}] [${roleChannelId}] Failed to get role channel.`);
       continue;
@@ -181,8 +195,10 @@ export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean) => 
     const members = await guild.members.fetch();
     const count = reset ? 0 : members.filter((member) => hasRole(member, roleIds)).size;
     const newName = `${text}: ${count.toLocaleString()}`;
-    await updateChannelName(guild, roleChannelId, newName);
+    roles[roleChannelId] = { name: newName, count, text };
+    //await updateChannelName(guild, roleChannelId, newName);
   }
+  return roles;
 };
 
 export const hasRole = (member: GuildMember, roleIds: Snowflake[]) => {
