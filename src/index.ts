@@ -2,10 +2,8 @@ import { Client, Collection, GatewayIntentBits } from 'discord.js';
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { updateGuildStats } from './services';
-import { GuildStatsConfig } from './types';
-
-const config: GuildStatsConfig = require('./config.json');
+import config from './config.json';
+import { updateGuilds } from './services';
 
 const loadHandlers = (client: Client) => {
   const handlersDir = join(__dirname, './handlers');
@@ -17,23 +15,20 @@ const loadHandlers = (client: Client) => {
   });
 };
 
-const { MessageContent, GuildBans, GuildEmojisAndStickers, GuildInvites, GuildMembers, GuildMessages, GuildPresences, Guilds, GuildScheduledEvents, GuildVoiceStates } = GatewayIntentBits;
-const intents = [
-  MessageContent,
-  GuildBans,
-  GuildEmojisAndStickers,
-  GuildInvites,
-  GuildMembers,
-  GuildMessages,
-  GuildPresences,
-  Guilds,
-  GuildScheduledEvents,
-  GuildVoiceStates,
-];
-
-const client = new Client({intents});
+const client = new Client({intents: [
+  GatewayIntentBits.MessageContent,
+  GatewayIntentBits.GuildBans,
+  GatewayIntentBits.GuildEmojisAndStickers,
+  GatewayIntentBits.GuildInvites,
+  GatewayIntentBits.GuildMembers,
+  GatewayIntentBits.GuildMessages,
+  GatewayIntentBits.GuildPresences,
+  GatewayIntentBits.Guilds,
+  GatewayIntentBits.GuildScheduledEvents,
+  GatewayIntentBits.GuildVoiceStates,
+]});
 client.cooldowns = new Collection<string, number>();
 loadHandlers(client);
 client.login(config.token);
 
-setInterval(async () => await updateGuildStats(client, false), config.updateIntervalM * 60 * 1000);
+setInterval(async () => await updateGuilds(client, false), config.updateIntervalM * 60 * 1000);
