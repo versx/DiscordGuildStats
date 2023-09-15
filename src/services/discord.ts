@@ -1,16 +1,16 @@
 import {
-  ChannelType,
   Client,
   Guild,
-  GuildBasedChannel,
   GuildMember,
-  OverwriteType,
   Snowflake,
 } from 'discord.js';
 
 import { color, sleep } from '.';
-import { DiscordGuildConfig, GuildStatsConfig } from '../types';
+import { GuildStatsConfig } from '../types';
 const config: GuildStatsConfig = require('../config.json');
+
+const SleepBetweenGuilds = 5;
+const SleepBetweenChannels = 1;
 
 export const startUpdate = async (client: Client) => {
   const guilds = client.guilds.cache.filter((guild) => !!config.servers[guild.id]);
@@ -28,8 +28,10 @@ export const startUpdate = async (client: Client) => {
     console.log(`${color('text', `Updating guild ${color('variable', guild.name)}`)}`);
     //const category = await getOrCreateCategory(guild, config.servers[guildId]);
     //await updateGuildStats(guild, category);
+
     await updateGuildStats(guild);
-    await sleep(5 * 1000); // Wait 5 seconds between each update
+    // Wait 5 seconds between each guild update
+    await sleep(SleepBetweenGuilds * 1000);
   }
 };
 
@@ -86,15 +88,9 @@ export const updateChannelName = async (guild: Guild, channelId: string, newName
     return;
   }
 
-  //await channel.edit({
-  //  name: newName,
-  //  //type: ChannelType.GuildVoice,
-  //  //position: 0,
-  //  topic: newName,
-  //  //parent?: CategoryChannelResolvable | null;
-  //});
   await channel.setName(newName);
-  await sleep(3 * 1000); // Wait three seconds between each update
+  // Wait three seconds between each channel update
+  await sleep(SleepBetweenChannels * 1000);
 };
 
 export const getGuildMemberRoleCounts = async (guild: Guild) => {
@@ -120,7 +116,8 @@ export const getGuildMemberRoleCounts = async (guild: Guild) => {
     }
 
     await channel.setName(newName);
-    await sleep(3 * 1000); // Wait three seconds between each update
+    // Wait three seconds between each channel update
+    await sleep(SleepBetweenChannels * 1000);
   }
 };
 
