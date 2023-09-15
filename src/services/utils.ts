@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import { writeFile } from 'node:fs';
 import { resolve } from 'node:path';
 
+import { logDebug } from '.';
 import { ColorType, DumpStats } from '../types';
 
 const themeColors = {
@@ -67,6 +68,6 @@ export const dumpGuildStatistics = (fileName: string, stats: DumpStats) => {
   }
 
   writeFile(path, DefaultHeader + data, { encoding: 'utf-8' }, () => {
-    //logDebug(`Guild statistics dumped to ${path}`);
+    logDebug(`Guild statistics dumped to ${path}`);
   });
 };

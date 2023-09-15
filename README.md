@@ -5,7 +5,7 @@
 
 # Discord Guild Statistics Bot  
 
-Displays Discord Guild statistics for members, bots, roles, channels, and role counts. Supports multiple Discord servers.  
+Displays Discord Guild statistics for members, bots, roles, channels, assigned member roles, invites, bans, reactions, stickers, and scheduled events counts.  
 
 ## Features  
 - Statistics for:
@@ -14,11 +14,14 @@ Displays Discord Guild statistics for members, bots, roles, channels, and role c
   * Role counts  
   * Channel counts  
   * Invite counts
-  * Reaction counts
-  * Scheduled event counts
   * Ban counts
+  * Reaction counts
+  * Sticker counts
+  * Scheduled event counts
   * Assigned member role counts  
 - Automatically updates every specified minutes  
+- Supports multiple Discord servers  
+- Log level filtering  
 
 ## Prerequisites
 - [Node.js v16 or higher](https://nodejs.org/en/download)  
@@ -26,9 +29,10 @@ Displays Discord Guild statistics for members, bots, roles, channels, and role c
 ## Installation
 1. Clone repository: `git clone https://github.com/versx/DiscordGuildStats`  
 1. Install packages `npm install`  
-1. Build in root project folder (same folder `src`, `build`, etc are in): `npm run build`  
-1. Copy example config `cp src/config.example.json build/config.json`  
+1. Copy example config `cp src/config.example.json src/config.json`  
 1. Fill out config options.  
+1. Build in root project folder (same folder `src`, `build`, etc are in): `npm run build`  
+1. Copy config to build folder `cp src/config.json build/config.json`  
 1. Run `npm run start`  
 
 ## Updating  
@@ -41,3 +45,4 @@ Displays Discord Guild statistics for members, bots, roles, channels, and role c
 
 ## Notes  
 - Not specifying a channel ID (i.e. `null`) for a statistics count in the config will omit that statistic from being updated.  
+- Not specifying a file name for the guild statistics dump will use the date (i.e. `2023-09-15.csv`) by default.  

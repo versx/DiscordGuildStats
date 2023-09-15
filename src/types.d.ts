@@ -28,6 +28,7 @@ export type DiscordGuildStatsConfig = {
     enabled: boolean;
     fileName: string;
   };
+  logLevel: LogLevel;
   servers: {
     [guildId: Snowflake]: DiscordGuildConfig;
   };
@@ -82,6 +83,8 @@ export type DumpStats = {
   };
 };
 
-export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'memberRoles' | 'invites' | 'bans';
+export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'memberRoles' | 'invites' | 'bans' | 'reactions' | 'stickers' | 'scheduledEvents';
 
 export type ColorType = 'text' | 'variable' | 'error' | 'date';
+
+export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'none';

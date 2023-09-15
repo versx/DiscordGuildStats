@@ -38,7 +38,7 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
 
     // Check if guild statistics have been updated recently
     if (isAlreadyUpdated(lastUpdated[guildId], config.updateIntervalM)) {
-      //logDebug(`[${guild.name}] Guild already updated within ${config.updateIntervalM} minutes, skipping...`);
+      logDebug(`[${guild.name}] Guild already updated within ${config.updateIntervalM} minutes, skipping...`);
       continue;
     }
 
@@ -180,7 +180,7 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
   }
 
   if (channel.name === newName) {
-    //logDebug(`[${guild.name}, ${channelId}] Channel name already set to '${newName}', skipping...`);
+    logDebug(`[${guild.name}, ${channelId}] Channel name already set to '${newName}', skipping...`);
     return false;
   }
   
