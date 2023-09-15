@@ -1,12 +1,13 @@
 import { GuildMember } from 'discord.js';
 
+import { log } from '../services';
 import { BotEvent } from '../types';
 
 const event: BotEvent = {
   name: 'guildMemberRemove',
   once: false,
   execute: async (member: GuildMember) => {
-    console.log('User', member.user.username, 'left guild', member.guild.name);
+    log(`[${member.guild.name}] Member ${member.user.username} left.`);
     // TODO: Trigger stats update
   },
 };

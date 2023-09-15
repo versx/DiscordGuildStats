@@ -5,31 +5,39 @@ import {
   Snowflake,
 } from 'discord.js';
 
-import { color, getTime, isAlreadyUpdated, sleep } from '.';
-import { lastUpdated } from '../data';
+import {
+  color,
+  getTime,
+  isAlreadyUpdated,
+  log, logDebug, logError, logWarn,
+  sleep,
+} from '.';
 import { GuildStatsConfig } from '../types';
 const config: GuildStatsConfig = require('../config.json');
 
 const SleepBetweenGuilds = 5; // 5
-const SleepBetweenChannels = 3; // 2
+const SleepBetweenChannels = 250; // 2
+
+export let lastUpdated: { [guildId: Snowflake]: number } = {};
 
 export const updateGuildStats = async (client: Client, reset: boolean) => {
   const guilds = client.guilds.cache.filter((guild) => !!config.servers[guild.id]);
   if (guilds.size === 0) {
-    console.error(`[${client.user?.id}] Bot is not in any guilds, skipping...`);
+    logError(`[${client.user?.id}] Bot is not in any guilds, skipping...`);
     return;
   }
 
   for (const [guildId, guild] of guilds) {
-    if (isAlreadyUpdated(guildId, config.updateIntervalM)) {
-      //console.debug(`[${guildId}] Guild already updated within ${config.updateIntervalM} minutes, skipping...`);
+    const lastUpdate = lastUpdated[guildId];
+    if (isAlreadyUpdated(lastUpdate, config.updateIntervalM)) {
+      //logDebug(guild, `Guild already updated within ${config.updateIntervalM} minutes, skipping...`);
       continue;
     }
 
     //const category = await getOrCreateCategory(guild, config.servers[guildId]);
     const guildConfig = config.servers[guildId];
     if (!guildConfig) {
-      console.warn(`[${guildId}] Failed to get guild config.`);
+      logWarn(`[${guild.name}] Failed to get guild config.`);
       continue;
     }
 
@@ -46,79 +54,108 @@ export const updateGuildStats = async (client: Client, reset: boolean) => {
       //});
     }
 
-    // Fetch full list of members so bots are included
-    //await guild.members.fetch();
+    log(`[${guild.name}] ${color('text', `Checking guild ${color('variable', guild.name)} for updates...`)}`);
 
-    console.log(`${color('text', `Checking guild ${color('variable', guild.name)} for updates...`)}`);
+    if (!reset) {
+      await guild.fetch();
+      await guild.members.fetch();
+      await guild.roles.fetch();
+      await guild.channels.fetch();
+      await guild.invites.fetch();
+      await guild.bans.fetch();
+      await guild.emojis.fetch();
+      await guild.scheduledEvents.fetch();
+    }
 
     const memberCount = reset ? 0 : guild.memberCount;
-    //const botCount = reset ? 0 : guild.members.cache.filter(member => !!member.user.bot).size.toLocaleString();
-    const botCount = reset ? 0 : (await guild.members.fetch()).filter(member => !!member.user.bot).size;
-    //const roleCount = reset ? 0 : guild.roles.cache.size.toLocaleString();
-    //const roles = reset ? 0 : await guild.roles.fetch();//.cache.size.toLocaleString();
-    const roleCount = reset ? 0 : (await guild.roles.fetch()).size;//.cache.size.toLocaleString();
+    const botCount = reset ? 0 : guild.members.cache.filter(member => !!member.user.bot).size;
+    const roleCount = reset ? 0 : guild.roles.cache.size;
     const channelCount = reset ? 0 : guild.channels.cache.size;
-    //const inviteCount = reset ? 0 : guild.invites.cache.size.toLocaleString();
-    const inviteCount = reset ? 0 : (await guild.invites.fetch()).size;
-    //const banCount = reset ? 0 : guild.bans.cache.size;
-    const banCount = reset ? 0 : (await guild.bans.fetch()).size;
-    const scheduledEventCount = reset ? 0 : (await guild.scheduledEvents.fetch()).size;
-    const reactionCount = reset ? 0 : (await guild.emojis.fetch()).size;
+    const inviteCount = reset ? 0 : guild.invites.cache.size;
+    const banCount = reset ? 0 : guild.bans.cache.size;
+    const scheduledEventCount = reset ? 0 : guild.scheduledEvents.cache.size;
+    const reactionCount = reset ? 0 : guild.emojis.cache.filter(emoji => !emoji.managed).size;
 
+    let updated = false;
     // TODO: Voice Channels/Text Channels count
     if (guildConfig.memberCountChannelId) {
-      await updateChannelName(guild, guildConfig.memberCountChannelId, `Members: ${memberCount.toLocaleString()}`);
+      if (await updateChannelName(guild, guildConfig.memberCountChannelId, `Members: ${memberCount.toLocaleString()}`)) {
+        updated = true;
+        await sleep(SleepBetweenChannels);
+      }
     }
     if (guildConfig.botCountChannelId) {
-      await updateChannelName(guild, guildConfig.botCountChannelId, `Bots: ${botCount.toLocaleString()}`);
+      if (await updateChannelName(guild, guildConfig.botCountChannelId, `Bots: ${botCount.toLocaleString()}`)) {
+        updated = true;
+        await sleep(SleepBetweenChannels);
+      }
     }
     if (guildConfig.roleCountChannelId) {
-      await updateChannelName(guild, guildConfig.roleCountChannelId, `Roles: ${roleCount.toLocaleString()}`);
+      if (await updateChannelName(guild, guildConfig.roleCountChannelId, `Roles: ${roleCount.toLocaleString()}`)) {
+        updated = true;
+        await sleep(SleepBetweenChannels);
+      }
     }
     if (guildConfig.channelCountChannelId) {
-      await updateChannelName(guild, guildConfig.channelCountChannelId, `Channels: ${channelCount.toLocaleString()}`);
+      if (await updateChannelName(guild, guildConfig.channelCountChannelId, `Channels: ${channelCount.toLocaleString()}`)) {
+        updated = true;
+        await sleep(SleepBetweenChannels);
+      }
     }
     if (guildConfig.inviteCountChannelId) {
-      await updateChannelName(guild, guildConfig.inviteCountChannelId, `Invites: ${inviteCount.toLocaleString()}`);
+      if (await updateChannelName(guild, guildConfig.inviteCountChannelId, `Invites: ${inviteCount.toLocaleString()}`)) {
+        updated = true;
+        await sleep(SleepBetweenChannels);
+      }
     }
     if (guildConfig.banCountChannelId) {
-      await updateChannelName(guild, guildConfig.banCountChannelId, `Bans: ${banCount.toLocaleString()}`);
-    }
-    if (guildConfig.eventCountChannelId) {
-      await updateChannelName(guild, guildConfig.eventCountChannelId, `Scheduled Events: ${scheduledEventCount.toLocaleString()}`);
+      if (await updateChannelName(guild, guildConfig.banCountChannelId, `Bans: ${banCount.toLocaleString()}`)) {
+        updated = true;
+        await sleep(SleepBetweenChannels);
+      }
     }
     if (guildConfig.reactionCountChannelId) {
-      await updateChannelName(guild, guildConfig.reactionCountChannelId, `Reactions: ${reactionCount.toLocaleString()}`);
+      if (await updateChannelName(guild, guildConfig.reactionCountChannelId, `Reactions: ${reactionCount.toLocaleString()}`)) {
+        updated = true;
+        await sleep(SleepBetweenChannels);
+      }
+    }
+    if (guildConfig.eventCountChannelId) {
+      if (await updateChannelName(guild, guildConfig.eventCountChannelId, `Scheduled Events: ${scheduledEventCount.toLocaleString()}`)) {
+        updated = true;
+        await sleep(SleepBetweenChannels);
+      }
     }
     if (guildConfig.memberRoles) {
       await getGuildMemberRoleCounts(guild, reset);
+      await sleep(SleepBetweenChannels);
     }
 
     lastUpdated[guildId] = getTime();
-    console.log(`${color('text', `Updated guild ${color('variable', guild.name)} channel names...`)}`);
+    if (updated) {
+      log(`[${guild.name}] ${color('text', `Updated guild ${color('variable', guild.name)} channel names...`)}`);
 
-    // Wait 5 seconds between each guild update
-    await sleep(SleepBetweenGuilds * 1000);
+      // Wait 5 seconds between each guild update
+      await sleep(SleepBetweenGuilds * 1000);
+    }
   }
 };
 
-export const updateChannelName = async (guild: Guild, channelId: Snowflake, newName: string) => {
+export const updateChannelName = async (guild: Guild, channelId: Snowflake, newName: string): Promise<boolean> => {
   const channel = await guild.channels.fetch(channelId); //.cache.get(channelId);
   if (!channel) {
-    console.warn(`[${channelId}] Failed to get channel.`);
-    return;
+    logWarn(`[${guild.name}] [${channelId}] Failed to get channel.`);
+    return false;
   }
 
   if (channel.name === newName) {
-    //console.debug(`[${channelId}] Channel name already set to '${newName}', skipping...`);
-    return;
+    //debug(guild, channelId, `Channel name already set to '${newName}', skipping...`);
+    return false;
   }
   
-  console.log(`[${new Date().toLocaleTimeString()}] [${guild.name}, ${channelId}] Channel name changed, updating from '${channel.name}' to '${newName}'.`);
+  log(`[${guild.name}] [${channelId}] Channel name changed, updating from '${channel.name}' to '${newName}'.`);
   await channel.setName(newName, 'update channel name');
-
-  // Wait three seconds between each channel update
-  await sleep(SleepBetweenChannels * 1000);
+  return true;
 };
 
 export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean) => {
@@ -133,7 +170,7 @@ export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean) => 
 
     const channel = await guild.channels.fetch(roleChannelId);
     if (!channel) {
-      console.warn(`[${roleChannelId}] Failed to get role channel.`);
+      logWarn(`[${guild.name}] [${roleChannelId}] Failed to get role channel.`);
       continue;
     }
 
@@ -152,7 +189,6 @@ export const hasRole = (member: GuildMember, roleIds: Snowflake[]) => {
 
 //export const getOrCreateCategory = async (guild: Guild, guildConfig: DiscordGuildConfig) => {
 //  let category = guild.channels.cache.find((category) => category.type === ChannelType.GuildCategory && category.name === guildConfig.category.name);
-//  console.log('category:', category);
 //  if (!category) {
 //    category = await guild.channels.create({
 //      name: guildConfig.category?.name!,

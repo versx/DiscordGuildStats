@@ -1,12 +1,11 @@
 import chalk from 'chalk';
-import { Snowflake } from 'discord.js';
 
-import { lastUpdated } from '../data';
 import { ColorType } from '../types';
 
 const themeColors = {
   text: '#ff8e4d',
   variable: '#ff624d',
+  date: '#ffddee',
   error: '#f5426c',
 };
 
@@ -18,12 +17,11 @@ export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve
 
 export const getTime = () => Math.floor(Date.now() / 1000);
 
-export const isAlreadyUpdated = (guildId: Snowflake, interval: number = 15): boolean => {
-  if (!lastUpdated[guildId]) {
+export const isAlreadyUpdated = (lastUpdate: number, interval: number = 15): boolean => {
+  if (lastUpdate === 0) {
     return false;
   }
   const now = getTime();
-  const lastUpdate = lastUpdated[guildId];
   const delta = interval * 60
   const minsAgo = now - lastUpdate;
   const result = lastUpdate === 0 || minsAgo <= 0 || minsAgo <= delta;

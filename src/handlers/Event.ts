@@ -2,7 +2,7 @@ import { Client } from 'discord.js';
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { color } from '../services/utils';
+import { color, log } from '../services';
 import { BotEvent } from '../types';
 
 module.exports = (client: Client) => {
@@ -16,6 +16,6 @@ module.exports = (client: Client) => {
     event.once
       ? client.once(event.name, (...args) => event.execute(...args))
       : client.on(event.name, (...args) => event.execute(...args));
-    console.log(color('text', `🌠 Successfully loaded event ${color('variable', event.name)}`));
+    log(color('text', `🌠 Successfully loaded event ${color('variable', event.name)}`));
   });
 };

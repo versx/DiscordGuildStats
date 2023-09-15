@@ -62,4 +62,4 @@ export type DiscordCategoryConfig = {
 
 export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'memberRoles' | 'invites' | 'bans';
 
-export type ColorType = 'text' | 'variable' | 'error';
+export type ColorType = 'text' | 'variable' | 'error' | 'date';

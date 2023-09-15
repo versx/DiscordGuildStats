@@ -18,8 +18,19 @@ const loadHandlers = (client: Client) => {
   });
 };
 
-const { Guilds, MessageContent, GuildMessages, GuildMembers } = GatewayIntentBits;
-const intents = [Guilds, MessageContent, GuildMessages, GuildMembers];
+const { MessageContent, GuildBans, GuildEmojisAndStickers, GuildInvites, GuildMembers, GuildMessages, GuildPresences, Guilds, GuildScheduledEvents, GuildVoiceStates } = GatewayIntentBits;
+const intents = [
+  MessageContent,
+  GuildBans,
+  GuildEmojisAndStickers,
+  GuildInvites,
+  GuildMembers,
+  GuildMessages,
+  GuildPresences,
+  Guilds,
+  GuildScheduledEvents,
+  GuildVoiceStates,
+];
 
 for (const guildId in config.servers) {
   const client = new Client({intents});
