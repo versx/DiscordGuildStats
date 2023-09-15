@@ -39,4 +39,4 @@ setInterval(async () => {
     }
     await startUpdate(client);
   }
-}, config.updateIntervalM * 1000);
+}, config.updateIntervalM * 60 * 1000);
