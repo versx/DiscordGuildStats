@@ -24,7 +24,10 @@ export interface BotEvent {
 };
 
 export type DiscordGuildStatsConfig = {
-  dumpStatistics: boolean;
+  dumpStatistics: {
+    enabled: boolean;
+    fileName: string;
+  };
   servers: {
     [guildId: Snowflake]: DiscordGuildConfig;
   };

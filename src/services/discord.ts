@@ -7,7 +7,7 @@ import {
 
 import {
   color,
-  dumpStatistics,
+  dumpGuildStatistics,
   formatDate,
   getTime,
   isAlreadyUpdated,
@@ -136,7 +136,8 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
       await sleep(config.sleepBetweenChannels);
     }
 
-    if (config.dumpStatistics) {
+    if (config.dumpStatistics.enabled) {
+      // Build statistics dump for each guild
       stats[guildId] = {
         Date: formatDate(new Date()),
         Guild: guild.name,
@@ -150,8 +151,6 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
         const roleStat = roleStats[roleChannelId];
         stats[guildId][roleStat.text] = roleStat.count;
       }
-
-      console.log('stats:', stats);
     }
 
     //const category = await getOrCreateCategory(guild, config.servers[guildId].category?.name);
@@ -166,9 +165,10 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
     }
   }
 
-  if (config.dumpStatistics) {
+  // Dump guild statistics if enabled
+  if (config.dumpStatistics.enabled) {
     logDebug(`Dumping guild statistics...`);
-    dumpStatistics(stats);
+    dumpGuildStatistics(config.dumpStatistics.fileName, stats);
   }
 };
 

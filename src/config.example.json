@@ -1,5 +1,8 @@
 {
-  "dumpStatistics": false,
+  "dumpStatistics": {
+    "enabled": false,
+    "fileName": "dumps.csv"
+  },
   "servers": {
     "<DISCORD_GUILD1_ID>": {
       "name": "<DESCRIPTIVE_NAME>",

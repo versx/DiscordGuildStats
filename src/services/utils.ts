@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { writeFileSync } from 'node:fs';
+import { writeFile } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { ColorType, DumpStats } from '../types';
@@ -39,40 +39,32 @@ export const formatDate = (date: Date) => {
   return formattedDate;
 };
 
-export const dumpStatistics = (stats: DumpStats) => {  
-  const date = formatDate(new Date());
-  const path = resolve(__dirname, `../../dumps/${date}.csv`);
+export const dumpGuildStatistics = (fileName: string, stats: DumpStats) => {  
+  const name = !fileName || fileName === ''
+    ? formatDate(new Date()) + '.csv'
+    : fileName; 
+  const path = resolve(__dirname, `../../dumps/${name}`);
 
-  // Print column headers
-  let data = '[';
+  let data = '';
   const guildIds = Object.keys(stats);
   for (const guildId of guildIds) {
     const guildStats = stats[guildId];
-    const headers = Object.keys(guildStats);
-    for (let i = 0; i < headers.length; i++) {
-      if (i !== 0) {
-        data += ',';
-      }
-      data += `${headers[i]}`;
-    }
-    data += ']\n';
-    break;
-  }
+    const columns = Object.keys(guildStats);
 
-  for (const guildId of guildIds) {
-    const guildStats = stats[guildId];
-    const headers = Object.keys(guildStats);
-  
-    // Print column values
-    for (let i = 0; i < headers.length; i++) {
-      if (i !== 0) {
-        data += ',';
-      }
-      const header = headers[i];
-      const value = guildStats[header];
-      data += `${value}`;
+    for (const column of columns) {
+      const value = guildStats[column];
+      data += `${column},${value}\n`;
     }
+
     data += '\n';
   }
-  writeFileSync(path, data, { encoding: 'utf-8' });
+
+  // Skip statistics dump if no data
+  if (!data || data === '') {
+    return;
+  }
+
+  writeFile(path, data, { encoding: 'utf-8' }, () => {
+    //logDebug(`Guild statistics dumped to ${path}`);
+  });
 };
