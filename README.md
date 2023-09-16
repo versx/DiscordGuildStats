@@ -8,6 +8,8 @@
 
 Displays Discord Guild statistics for members, bots, roles, channels, assigned member roles, invites, bans, reactions, stickers, and scheduled events counts.  
 
+_**This is a rewrite in Typescript of my original [`GuildStats`](https://github.com/versx/GuildStats) project.**_  
+
 ## Features  
 - Statistics for:
   * Member counts  
