@@ -7,6 +7,9 @@
 
 Displays Discord Guild statistics for members, bots, roles, channels, assigned member roles, invites, bans, reactions, stickers, and scheduled events counts.  
 
+## Preview  
+![Image Preview](https://raw.githubusercontent.com/versx/DiscordGuildStats/master/.github/images/preview.png)  
+
 ## Features  
 - Statistics for:
   * Member counts  
@@ -142,9 +145,6 @@ Displays Discord Guild statistics for members, bots, roles, channels, assigned m
   }
 }
 ```
-
-## Preview  
-![Image Preview](https://raw.githubusercontent.com/versx/GuildStats/master/example.png)  
 
 ## Notes  
 - Not specifying a channel ID (i.e. `null`) for a statistics count in the config will omit that statistic from being updated.  
