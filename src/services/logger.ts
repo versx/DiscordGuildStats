@@ -3,8 +3,7 @@ import { DiscordGuildStatsConfig, LogLevel } from '../types';
 const config: DiscordGuildStatsConfig = require('../config.json');
 
 export const log = (message: string) => {
-  if (!isLogLevel(config.logLevel, 'info')) {
-    console.log('skipping log:', config.logLevel, 'info');
+  if (!isLogLevel(config.logs.level, 'info')) {
     return;
   }
   const date = new Date().toLocaleTimeString();
@@ -12,7 +11,7 @@ export const log = (message: string) => {
 };
 
 export const logDebug = (message: string) => {
-  if (!isLogLevel(config.logLevel, 'debug')) {
+  if (!isLogLevel(config.logs.level, 'debug')) {
     return;
   }
   const date = new Date().toLocaleTimeString();
@@ -20,7 +19,7 @@ export const logDebug = (message: string) => {
 };
 
 export const logTrace = (message: string) => {
-  if (!isLogLevel(config.logLevel, 'trace')) {
+  if (!isLogLevel(config.logs.level, 'trace')) {
     return;
   }
   const date = new Date().toLocaleTimeString();
@@ -28,7 +27,7 @@ export const logTrace = (message: string) => {
 };
 
 export const logWarn = (message: string) => {
-  if (!isLogLevel(config.logLevel, 'warn')) {
+  if (!isLogLevel(config.logs.level, 'warn')) {
     return;
   }
   const date = new Date().toLocaleTimeString();
@@ -36,7 +35,7 @@ export const logWarn = (message: string) => {
 };
 
 export const logError = (message: string) => {
-  if (!isLogLevel(config.logLevel, 'error')) {
+  if (!isLogLevel(config.logs.level, 'error')) {
     return;
   }
   const date = new Date().toLocaleTimeString();
