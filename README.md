@@ -31,11 +31,11 @@ Displays Discord Guild statistics for members, bots, roles, channels, assigned m
 
 ## Installation
 1. Clone repository: `git clone https://github.com/versx/DiscordGuildStats`  
-1. Install packages `npm install`  
-1. Copy example config `cp src/config.example.json src/config.json`  
+1. Install packages: `npm install`  
+1. Copy example config: `cp src/config.example.json src/config.json`  
 1. Fill out config options.  
-1. Build in root project folder (same folder `src`, `build`, etc are in): `npm run build`  
-1. Run `npm run start`  
+1. Build in root project folder: `npm run build`  
+1. Run: `npm run start`  
 
 ## Updating  
 1. Pull latest changes in root folder `git pull`  
