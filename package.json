@@ -6,7 +6,7 @@
     "scripts": {
         "start": "npm run build && node build/index.js",
         "build": "tsc",
-        "ci": "npm run build"
+        "ci": "cp src/config.example.json src/config.json && npm run build"
     },
     "keywords": [],
     "author": "versx",
