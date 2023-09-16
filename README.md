@@ -1,4 +1,5 @@
 [![Build](https://github.com/versx/DiscordGuildStats/actions/workflows/node.js.yml/badge.svg)](https://github.com/versx/DiscordGuildStats/actions/workflows/node.js.yml)
+![ts](https://badgen.net/badge/Built%20With/TypeScript/blue)
 [![GitHub Release](https://img.shields.io/github/release/versx/DiscordGuildStats.svg)](https://github.com/versx/DiscordGuildStats/releases/)
 [![GitHub Contributors](https://img.shields.io/github/contributors/versx/DiscordGuildStats.svg)](https://github.com/versx/DiscordGuildStats/graphs/contributors/)
 [![Discord](https://img.shields.io/discord/552003258000998401.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/zZ9h9Xa)  
