@@ -8,9 +8,6 @@
 
 Displays Discord Guild statistics for members, bots, roles, channels, assigned member roles, invites, bans, reactions, stickers, and scheduled events counts.  
 
-## Preview  
-![Image Preview](https://raw.githubusercontent.com/versx/DiscordGuildStats/master/.github/images/preview.png)  
-
 ## Features  
 - Statistics for:
   * Member counts  
@@ -26,6 +23,9 @@ Displays Discord Guild statistics for members, bots, roles, channels, assigned m
 - Automatically updates every specified minutes  
 - Supports multiple Discord servers  
 - Log level filtering  
+
+## Preview  
+![Image Preview](https://raw.githubusercontent.com/versx/DiscordGuildStats/master/.github/images/preview.png)  
 
 ## Prerequisites
 - [Node.js v16 or higher](https://nodejs.org/en/download)  
