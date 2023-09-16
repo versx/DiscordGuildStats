@@ -3,18 +3,12 @@ import { writeFile } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { logDebug } from '.';
-import { ColorType, DumpStats } from '../types';
+import { ColorType, DiscordGuildStatsConfig, DumpStats } from '../types';
 
-const themeColors = {
-  text: '#ff8e4d',
-  variable: '#ff624d',
-  date: '#ffddee',
-  error: '#f5426c',
-};
-
+const config: DiscordGuildStatsConfig = require('../config.json');
 const DefaultHeader = '[Column,Value]\n';
 
-export const color = (color: ColorType, message: any) => chalk.hex(themeColors[color])(message);
+export const color = (color: ColorType, message: any) => chalk.hex(config.logs.colors[color])(message);
 
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 

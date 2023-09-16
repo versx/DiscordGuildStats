@@ -52,11 +52,33 @@ Displays Discord Guild statistics for members, bots, roles, channels, assigned m
       "invites", "bans", "reactions", "stickers",
       "scheduledEvents", "memberRoles"
     ],
-    // File name of the statistics dump. Leaving the `fileName` blank/empty will default to the date. (i.e. `2023-09-15.csv`)
+    // File name of the statistics dump. Leaving the `fileName` blank/empty
+    // will default to the date. (i.e. `2023-09-15.csv`)
     "fileName": "dumps.csv"
   },
-  // Log level to filter logs.
-  "logLevel": "info",
+  // Logging configuration.
+  "logs": {
+    // Log level to filter logs by.
+    // Available values:
+    //  - trace (log everything)
+    //  - debug (only log debug, info, warnings, and errors)
+    //  - info (only log info, warnings, and errors)
+    //  - warn (only log warnings and errors)
+    //  - error (only log errors)
+    //  - none (disable logging)
+    "level": "info",
+    // Log color dictionary.
+    "colors": {
+      // Normal text
+      "text": "#ffffff",
+      // Variables
+      "variable": "#ff624d",
+      // Dates
+      "date": "#4287f5",
+      // Errors
+      "error": "#ff0000"
+    }
+  },
   // Delay between each channel update in milliseconds.
   "sleepBetweenChannels": 250,
   // Delay between each guild update in milliseconds.
@@ -65,7 +87,8 @@ Displays Discord Guild statistics for members, bots, roles, channels, assigned m
   "status": null,
   // Discord bot token.
   "token": "<DISCORD_BOT_TOKEN>",
-  // Update interval in minutes.
+  // Update interval in minutes. Specify `0` will only rely on
+  // Discord events to check for Discord guild changes.
   "updateIntervalM": 15,
   // Discord servers to include for updating statistics.
   "servers": {
@@ -126,11 +149,4 @@ Displays Discord Guild statistics for members, bots, roles, channels, assigned m
 ## Notes  
 - Not specifying a channel ID (i.e. `null`) for a statistics count in the config will omit that statistic from being updated.  
 - Not specifying a file name for the guild statistics dump will use the date (i.e. `2023-09-15.csv`) by default.  
-
-## Log Levels  
-- `trace` (Log everything)  
-- `debug` (Log debug, info, warnings, and errors)  
-- `info` (Log info, warnings, and errors)  
-- `warn` (Log only warnings and errors)  
-- `error` (Log only errors)  
-- `none` (Log nothing)  
+- Specifying `0` for `updateIntervalM` will disable the interval timer and only rely on Discord events to check for Discord guild changes.  

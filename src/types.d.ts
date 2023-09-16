@@ -29,7 +29,10 @@ export type DiscordGuildStatsConfig = {
     data: StatType[];
     fileName: string;
   };
-  logLevel: LogLevel;
+  logs: {
+    level: LogLevel;
+    colors: LogColorsConfig;
+  };
   servers: {
     [guildId: Snowflake]: DiscordGuildConfig;
   };
@@ -55,6 +58,11 @@ export type DiscordGuildConfig = {
     [roleId: Snowflake]: DiscordMemberRolesConfig;
   };
   //category?: DiscordCategoryConfig;
+};
+
+export type LogColorsConfig = {
+  //[type: ColorType]: string;
+  [type: string]: string;
 };
 
 export type DiscordMemberRolesConfig = {

@@ -8,7 +8,15 @@
     ],
     "fileName": "dumps.csv"
   },
-  "logLevel": "info",
+  "logs": {
+    "level": "info",
+    "colors": {
+      "text": "#ffffff",
+      "variable": "#ff624d",
+      "date": "#4287f5",
+      "error": "#ff0000"
+    }
+  },
   "sleepBetweenChannels": 250,
   "sleepBetweenGuilds": 3000,
   "status": null,
