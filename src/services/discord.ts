@@ -11,6 +11,7 @@ import {
   formatDate,
   getTime,
   isAlreadyUpdated,
+  isPlural,
   log, logDebug, logError, logWarn,
   sleep,
 } from '.';
@@ -90,23 +91,11 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
 
     // Check if guild statistics have been updated recently
     if (isAlreadyUpdated(lastUpdated[guildId], config.updateIntervalM)) {
-      logDebug(`[${color('variable', guild.name)}] Guild already updated within ${config.updateIntervalM} minutes, skipping...`);
+      logDebug(`[${color('variable', guild.name)}] Guild already updated within ${config.updateIntervalM} minute${isPlural(config.updateIntervalM)}, skipping...`);
       continue;
     }
 
-    log(`[${guild.name}] ${color('text', `Checking guild ${color('variable', guild.name)} for updates...`)}`);
-    if (!reset) {
-      // Fetch all Discord objects
-      await guild.fetch();
-      await guild.members.fetch();
-      await guild.roles.fetch();
-      await guild.channels.fetch();
-      await guild.invites.fetch();
-      await guild.bans.fetch();
-      await guild.emojis.fetch();
-      await guild.stickers.fetch();
-      await guild.scheduledEvents.fetch();
-    }
+    log(`[${color('variable', guild.name)}] ${color('text', `Checking guild for updates...`)}`);
 
     const counts: GuildStatistics = {
       members: reset ? 0 : guild.memberCount,
@@ -187,7 +176,7 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
 
     //const category = await getOrCreateCategory(guild, config.servers[guildId].category?.name);
     if (updated) {
-      log(`[${color('variable', guild.name)}] ${color('text', `Updated guild ${color('variable', guild.name)} channel names...`)}`);
+      log(`[${color('variable', guild.name)}] ${color('text', `Updated guild channel names...`)}`);
 
       // Set time of last update for guild
       lastUpdated[guildId] = getTime();
@@ -215,11 +204,11 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
     logDebug(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Channel name already set to '${color('variable', newName)}', skipping...`);
     return false;
   }
-  
+
   log(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Channel name changed, updating from '${color('variable', channel.name)}' to '${color('variable', newName)}'.`);
   await channel.setName(newName, 'update channel name');
-  await sleep(config.sleepBetweenChannels);
 
+  await sleep(config.sleepBetweenChannels);
   return true;
 };
 

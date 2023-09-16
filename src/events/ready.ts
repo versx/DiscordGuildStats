@@ -10,6 +10,18 @@ const event: BotEvent = {
   name: 'ready',
   once: true,
   execute: async (client: Client) => {
+    await client.guilds.fetch();
+
+    for (const guildId in client.guilds) {
+      const guild = client.guilds.cache.get(guildId);
+      if (!guild) {
+        logWarn(`Failed to fetch guild with id: ${color('variable', guildId)}`);
+        continue;
+      }
+
+      await guild.members.fetch();
+      await guild.channels.fetch();
+    }
 
     const user = client.user?.tag;
     const users = client.users.cache.size;
@@ -18,6 +30,7 @@ const event: BotEvent = {
     
     log(color('text', `💪 Logged in as ${color('variable', user)}`));
     log(color('text', `🤖 Bot has started, with ${color('variable', users.toLocaleString())} user${isPlural(users)}, in ${color('variable', channels.toLocaleString())} channel${isPlural(channels)} of ${color('variable', guilds.toLocaleString())} guild${isPlural(guilds)}.`));
+    console.log();
 
     if (config?.status) {
       client.user?.setActivity(config.status);
