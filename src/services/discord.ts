@@ -74,7 +74,7 @@ export const buildStatistics = async (guild: Guild, counts: GuildStatistics, res
 export const updateGuilds = async (client: Client, reset: boolean) => {
   const guilds = client.guilds.cache.filter((guild) => !!config.servers[guild.id]);
   if (guilds.size === 0) {
-    logError(`[${client.user?.id}] Bot is not in any guilds, skipping...`);
+    logError(`[${color('variable', client.user?.id)}] Bot is not in any guilds, skipping...`);
     return;
   }
 
@@ -84,13 +84,13 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
     const guild = guilds.get(guildId);
     const guildConfig = config.servers[guildId];
     if (!guild) {
-      logWarn(`[${guildConfig.name}] Failed to get guild with id: ${guildId}`);
+      logWarn(`[${color('variable', guildConfig.name)}] Failed to get guild with id: ${color('variable', guildId)}`);
       continue;
     }
 
     // Check if guild statistics have been updated recently
     if (isAlreadyUpdated(lastUpdated[guildId], config.updateIntervalM)) {
-      logDebug(`[${guild.name}] Guild already updated within ${config.updateIntervalM} minutes, skipping...`);
+      logDebug(`[${color('variable', guild.name)}] Guild already updated within ${config.updateIntervalM} minutes, skipping...`);
       continue;
     }
 
@@ -174,7 +174,9 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
       const roleStats = await getGuildMemberRoleCounts(guild, reset);
       for (const roleChannelId in roleStats) {
         const roleStat = roleStats[roleChannelId];
-        await updateChannelName(guild, roleChannelId, roleStat.name);
+        if (await updateChannelName(guild, roleChannelId, roleStat.name)) {
+          updated = true;
+        }
       }
     }
 
@@ -185,7 +187,7 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
 
     //const category = await getOrCreateCategory(guild, config.servers[guildId].category?.name);
     if (updated) {
-      log(`[${guild.name}] ${color('text', `Updated guild ${color('variable', guild.name)} channel names...`)}`);
+      log(`[${color('variable', guild.name)}] ${color('text', `Updated guild ${color('variable', guild.name)} channel names...`)}`);
 
       // Set time of last update for guild
       lastUpdated[guildId] = getTime();
@@ -205,16 +207,16 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
 export const updateChannelName = async (guild: Guild, channelId: Snowflake, newName: string): Promise<boolean> => {
   const channel = guild.channels.cache.get(channelId);
   if (!channel) {
-    logWarn(`[${guild.name}] [${channelId}] Failed to get channel.`);
+    logWarn(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Failed to get channel.`);
     return false;
   }
 
   if (channel.name === newName) {
-    logDebug(`[${guild.name}, ${channelId}] Channel name already set to '${newName}', skipping...`);
+    logDebug(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Channel name already set to '${color('variable', newName)}', skipping...`);
     return false;
   }
   
-  log(`[${guild.name}] [${channelId}] Channel name changed, updating from '${channel.name}' to '${newName}'.`);
+  log(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Channel name changed, updating from '${color('variable', channel.name)}' to '${color('variable', newName)}'.`);
   await channel.setName(newName, 'update channel name');
   await sleep(config.sleepBetweenChannels);
 
@@ -234,7 +236,7 @@ export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean): Pr
 
     const channel = guild.channels.cache.get(roleChannelId);
     if (!channel) {
-      logWarn(`[${guild.name}] [${roleChannelId}] Failed to get role channel.`);
+      logWarn(`[${color('variable', guild.name)}] [${color('variable', roleChannelId)}] Failed to get role channel.`);
       continue;
     }
 

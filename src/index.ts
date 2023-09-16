@@ -3,7 +3,7 @@ import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 import config from './config.json';
-import { color, log, updateGuilds } from './services';
+import { color, isPlural, log, updateGuilds } from './services';
 
 const loadHandlers = (client: Client) => {
   const handlersDir = join(__dirname, './handlers');
@@ -32,8 +32,8 @@ loadHandlers(client);
 client.login(config.token);
 
 if (config.updateIntervalM > 0) {
-  log(color('text', `Update interval specified to check every ${color('variable', config.updateIntervalM)} minutes for Discord guild changes...`));
-  setInterval(async () => await updateGuilds(client, false), config.updateIntervalM * 60 * 1000);
+  log(color('text', `Update interval specified to check every ${color('variable', config.updateIntervalM)} minute${isPlural(config.updateIntervalM)} for Discord guild changes...`));
+  setInterval(async () => await updateGuilds(client, false), config.updateIntervalM * 30 * 1000);
 } else {
   log(color('text', `Update interval not specified, defaulting to Discord events to check for Discord guild changes...`));
 }
