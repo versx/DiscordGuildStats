@@ -106,6 +106,10 @@ export type GuildStatistics = {
   scheduledEvents: number;
 };
 
+export type LastUpdateCache = {
+  [id: Snowflake]: number;
+};
+
 export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'memberRoles' | 'invites' | 'bans' | 'reactions' | 'stickers' | 'scheduledEvents';
 
 export type ColorType = 'text' | 'variable' | 'warn' | 'error' | 'date';

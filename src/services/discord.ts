@@ -21,11 +21,13 @@ import {
   DumpStats,
   GuildDumpStats,
   GuildStatistics,
+  LastUpdateCache,
   RoleStatistics,
 } from '../types';
 
 const config: DiscordGuildStatsConfig = require('../config.json');
-let lastUpdated: { [guildId: Snowflake]: number } = {};
+const guildLastUpdate: LastUpdateCache = {};
+const channelLastUpdate: LastUpdateCache = {};
 
 export const buildStatistics = async (guild: Guild, counts: GuildStatistics, reset: boolean): Promise<GuildDumpStats> => {
   const stats: GuildDumpStats = {
@@ -83,14 +85,13 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
   const guildIds = Object.keys(config.servers);
   for (const guildId of guildIds) {
     const guild = guilds.get(guildId);
-    const guildConfig = config.servers[guildId];
     if (!guild) {
-      logWarn(`[${color('variable', guildConfig.name)}] Failed to get guild with id: ${color('variable', guildId)}`);
+      logWarn(`[${color('variable', config.servers[guildId].name)}] Failed to get guild with id: ${color('variable', guildId)}`);
       continue;
     }
 
     // Check if guild statistics have been updated recently
-    if (isAlreadyUpdated(lastUpdated[guildId], config.updateIntervalM)) {
+    if (isAlreadyUpdated(guildLastUpdate[guildId], config.updateIntervalM > 0 ? config.updateIntervalM : 10)) {
       logDebug(`[${color('variable', guild.name)}] Guild already updated within ${config.updateIntervalM} minute${isPlural(config.updateIntervalM)}, skipping...`);
       continue;
     }
@@ -113,6 +114,7 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
     // TODO: const voiceChannelCount = reset ? 0 : guild.channels.cache.filter(channel => channel.type === ChannelType.GuildVoice).size;
   
     let updated = false;
+    const guildConfig = config.servers[guildId];
     if (guildConfig.memberCountChannelId) {
       if (await updateChannelName(guild, guildConfig.memberCountChannelId, `${locales.Members}: ${counts.members.toLocaleString()}`)) {
         updated = true;
@@ -179,7 +181,7 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
       log(`[${color('variable', guild.name)}] ${color('text', `Updated guild channel names...`)}`);
 
       // Set time of last update for guild
-      lastUpdated[guildId] = getTime();
+      guildLastUpdate[guildId] = getTime();
 
       // Wait between each guild update
       await sleep(config.sleepBetweenGuilds);
@@ -205,8 +207,14 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
     return false;
   }
 
+  if (isAlreadyUpdated(channelLastUpdate[channelId], 10)) {
+    logWarn(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Unable to update channel name, already updated within the last 10 minutes, skipping...`);
+    return false;
+  }
+
   log(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Channel name changed, updating from '${color('variable', channel.name)}' to '${color('variable', newName)}'.`);
   await channel.setName(newName, 'update channel name');
+  channelLastUpdate[channelId] = getTime();
 
   await sleep(config.sleepBetweenChannels);
   return true;

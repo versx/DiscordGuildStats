@@ -14,8 +14,8 @@ export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve
 
 export const getTime = () => Math.floor(Date.now() / 1000);
 
-export const isAlreadyUpdated = (lastUpdate: number, interval: number = 15): boolean => {
-  if (lastUpdate === 0) {
+export const isAlreadyUpdated = (lastUpdate: number, interval: number = 10): boolean => {
+  if (!lastUpdate || lastUpdate === 0) {
     return false;
   }
   const now = getTime();
