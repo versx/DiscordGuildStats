@@ -65,3 +65,5 @@ export const dumpGuildStatistics = (fileName: string, stats: DumpStats) => {
     logDebug(`Guild statistics dumped to ${path}`);
   });
 };
+
+export const isPlural = (value: number) => value > 1 ? 's' : '';
