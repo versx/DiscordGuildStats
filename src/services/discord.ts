@@ -16,8 +16,10 @@ import {
 } from '.';
 import locales from '../locales.json';
 import {
-  DiscordGuildStatsConfig, DumpStats,
-  GuildDumpStats, GuildStatistics,
+  DiscordGuildStatsConfig,
+  DumpStats,
+  GuildDumpStats,
+  GuildStatistics,
   RoleStatistics,
 } from '../types';
 

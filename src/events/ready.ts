@@ -8,8 +8,12 @@ const event: BotEvent = {
   name: 'ready',
   once: true,
   execute: async (client: Client) => {
-    log(color('text', `💪 Logged in as ${color('variable', client.user?.tag)}`));
-    log(color('text', `🤖 Bot has started, with ${color('variable', client.users.cache.size)} users, in ${color('variable', client.channels.cache.size)} channels of ${color('variable', client.guilds.cache.size)} guilds.`));
+    const user = client.user?.tag;
+    const users = client.users.cache.size.toLocaleString();
+    const guilds = client.guilds.cache.size.toLocaleString();
+    const channels = client.channels.cache.size.toLocaleString();
+    log(color('text', `💪 Logged in as ${color('variable', user)}`));
+    log(color('text', `🤖 Bot has started, with ${color('variable', users)} users, in ${color('variable', channels)} channels of ${color('variable', guilds)} guilds.`));
 
     if (config?.status) {
       client.user?.setActivity(config.status);
