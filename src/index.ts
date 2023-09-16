@@ -33,7 +33,7 @@ client.login(config.token);
 
 if (config.updateIntervalM > 0) {
   log(color('text', `Update interval specified to check every ${color('variable', config.updateIntervalM)} minute${isPlural(config.updateIntervalM)} for Discord guild changes...`));
-  setInterval(async () => await updateGuilds(client, false), config.updateIntervalM * 30 * 1000);
+  setInterval(async () => await updateGuilds(client, false), config.updateIntervalM * 60 * 1000);
 } else {
   log(color('text', `Update interval not specified, defaulting to Discord events to check for Discord guild changes...`));
 }
