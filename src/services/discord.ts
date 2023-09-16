@@ -91,7 +91,7 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
     }
 
     // Check if guild statistics have been updated recently
-    if (isAlreadyUpdated(guildLastUpdate[guildId], config.updateIntervalM > 0 ? config.updateIntervalM : 10)) {
+    if (isAlreadyUpdated(guildLastUpdate[guildId], config.updateIntervalM > 0 ? config.updateIntervalM : 15)) {
       logDebug(`[${color('variable', guild.name)}] Guild already updated within ${config.updateIntervalM} minute${isPlural(config.updateIntervalM)}, skipping...`);
       continue;
     }
@@ -209,7 +209,7 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
 
   // Check if the channel has been updated within the last 5 minutes, if so skip it to comply with Discord
   // Channel names can only be updated 2 within 10 minutes
-  if (isAlreadyUpdated(channelLastUpdate[channelId], 5)) {
+  if (isAlreadyUpdated(channelLastUpdate[channelId], 10)) {
     logWarn(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Unable to update channel name, already updated within the last 10 minutes, skipping...`);
     return false;
   }
