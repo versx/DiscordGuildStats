@@ -207,12 +207,14 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
     return false;
   }
 
-  if (isAlreadyUpdated(channelLastUpdate[channelId], 10)) {
+  // Check if the channel has been updated within the last 5 minutes, if so skip it to comply with Discord
+  // Channel names can only be updated 2 within 10 minutes
+  if (isAlreadyUpdated(channelLastUpdate[channelId], 5)) {
     logWarn(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Unable to update channel name, already updated within the last 10 minutes, skipping...`);
     return false;
   }
 
-  log(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Channel name changed, updating from '${color('variable', channel.name)}' to '${color('variable', newName)}'.`);
+  log(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Channel name changed from '${color('variable', channel.name)}' to '${color('variable', newName)}'.`);
   await channel.setName(newName, 'update channel name');
   channelLastUpdate[channelId] = getTime();
 
