@@ -82,7 +82,6 @@ export type RoleStatistics = {
 
 export type RoleStatistic = {
   text: string;
-  name: string;
   count: number;
 };
 

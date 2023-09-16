@@ -15,18 +15,20 @@ const loadHandlers = (client: Client) => {
   });
 };
 
-const client = new Client({intents: [
-  GatewayIntentBits.MessageContent,
-  GatewayIntentBits.GuildBans,
-  GatewayIntentBits.GuildEmojisAndStickers,
-  GatewayIntentBits.GuildInvites,
-  GatewayIntentBits.GuildMembers,
-  GatewayIntentBits.GuildMessages,
-  GatewayIntentBits.GuildPresences,
-  GatewayIntentBits.Guilds,
-  GatewayIntentBits.GuildScheduledEvents,
-  GatewayIntentBits.GuildVoiceStates,
-]});
+const client = new Client({
+  intents: [
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildBans,
+    GatewayIntentBits.GuildEmojisAndStickers,
+    GatewayIntentBits.GuildInvites,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildPresences,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildScheduledEvents,
+    GatewayIntentBits.GuildVoiceStates,
+  ],
+});
 client.cooldowns = new Collection<string, number>();
 loadHandlers(client);
 client.login(config.token);

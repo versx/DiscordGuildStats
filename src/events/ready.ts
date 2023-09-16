@@ -1,7 +1,7 @@
 import { Client } from 'discord.js';
 
 import config from '../config.json';
-import { color, isPlural, log, logWarn, updateGuilds } from '../services';
+import { color, fetchGuild, isPlural, log, logWarn, updateGuilds } from '../services';
 import { BotEvent } from '../types';
 
 // Reference: https://gist.github.com/koad/316b265a91d933fd1b62dddfcc3ff584
@@ -10,17 +10,18 @@ const event: BotEvent = {
   name: 'ready',
   once: true,
   execute: async (client: Client) => {
+    // Ensure we have all guild objects
     await client.guilds.fetch();
 
-    for (const guildId in client.guilds) {
+    for (const guildId in config.servers) {
       const guild = client.guilds.cache.get(guildId);
       if (!guild) {
         logWarn(`Failed to fetch guild with id: ${color('variable', guildId)}`);
         continue;
       }
 
-      await guild.members.fetch();
-      await guild.channels.fetch();
+      // Ensure we have all guilds populated with details
+      await fetchGuild(guild);
     }
 
     const user = client.user?.tag;

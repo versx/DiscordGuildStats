@@ -176,7 +176,6 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
       stats[guildId] = await buildStatistics(guild, counts, reset);
     }
 
-    //const category = await getOrCreateCategory(guild, config.servers[guildId].category?.name);
     if (updated) {
       log(`[${color('variable', guild.name)}] ${color('text', `Updated guild channel names...`)}`);
 
@@ -250,6 +249,18 @@ export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean): Pr
 export const hasRole = (member: GuildMember, roleIds: Snowflake[]) => {
   const count = roleIds.filter((roleId) => member.roles.cache.has(roleId)).length;
   return count;
+};
+
+export const fetchGuild = async (guild: Guild) => {
+  await guild.fetch();
+  await guild.members.fetch();
+  await guild.roles.fetch();
+  await guild.channels.fetch();
+  await guild.invites.fetch();
+  await guild.bans.fetch();
+  await guild.emojis.fetch();
+  await guild.stickers.fetch();
+  await guild.scheduledEvents.fetch();
 };
 
 //export const getOrCreateCategory = async (guild: Guild, categoryName: string) => {
