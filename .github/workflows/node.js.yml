@@ -21,8 +21,4 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install
-#    - run: npm install typescript -g
-    - run: cp src/config.example.json src/config.json
-    - run: npm ci
-    - run: tsc
-    - run: npm run start
+    - run: npm run ci

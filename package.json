@@ -5,7 +5,8 @@
     "main": "src/index.js",
     "scripts": {
         "start": "npm run build && node build/index.js",
-        "build": "tsc"
+        "build": "tsc",
+        "ci": "npm run build"
     },
     "keywords": [],
     "author": "versx",
