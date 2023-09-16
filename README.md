@@ -1,4 +1,4 @@
-[![Build](https://github.com/versx/DiscordGuildStats/actions/workflows/node.js.yml/badge.svg)](https://github.com/versx/DiscordGuildStats/actions/workflows/node.js.yml)
+[![Node.js CI](https://github.com/versx/DiscordGuildStats/actions/workflows/node.js.yml/badge.svg)](https://github.com/versx/DiscordGuildStats/actions/workflows/node.js.yml)
 ![ts](https://badgen.net/badge/Built%20With/TypeScript/blue)
 [![GitHub Release](https://img.shields.io/github/release/versx/DiscordGuildStats.svg)](https://github.com/versx/DiscordGuildStats/releases/)
 [![GitHub Contributors](https://img.shields.io/github/contributors/versx/DiscordGuildStats.svg)](https://github.com/versx/DiscordGuildStats/graphs/contributors/)
@@ -11,20 +11,22 @@ Displays Discord Guild statistics for members, bots, roles, channels, assigned m
 _**This is a rewrite in Typescript of my original [`GuildStats`](https://github.com/versx/GuildStats) project.**_  
 
 ## Features  
-- Statistics for:
-  * Member counts  
-  * Bot counts  
-  * Role counts  
-  * Channel counts  
-  * Invite counts
-  * Ban counts
-  * Reaction counts
-  * Sticker counts
-  * Scheduled event counts
-  * Assigned member role counts  
-- Automatically updates every specified minutes  
+- Guild statistics for:
+  * Total members count
+  * Total bots count
+  * Total roles count
+  * Total channels count
+  * Total invites count
+  * Total bans count
+  * Total reactions count
+  * Total stickers count
+  * Total scheduled events count
+  * Assigned member roles count
+- Updates at an interval every specified minutes or relies solely on Discord event triggers  
 - Supports multiple Discord servers  
 - Log level filtering  
+- Export/dump of specified guild statistics  
+- Locales to specify custom naming of channels  
 
 ## Preview  
 ![Image Preview](https://raw.githubusercontent.com/versx/DiscordGuildStats/master/.github/images/preview.png)  
