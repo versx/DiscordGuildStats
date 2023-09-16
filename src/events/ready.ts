@@ -4,6 +4,8 @@ import config from '../config.json';
 import { color, log, updateGuilds } from '../services';
 import { BotEvent } from '../types';
 
+// Reference: https://gist.github.com/koad/316b265a91d933fd1b62dddfcc3ff584
+
 const event: BotEvent = {
   name: 'ready',
   once: true,
