@@ -7,7 +7,7 @@ export const log = (message: string) => {
     return;
   }
   const date = new Date().toLocaleTimeString();
-  console.log(`[${color('date', date)}] ${message}.`);
+  console.log(`[${color('date', date)}] ${message}`);
 };
 
 export const logDebug = (message: string) => {
@@ -15,7 +15,7 @@ export const logDebug = (message: string) => {
     return;
   }
   const date = new Date().toLocaleTimeString();
-  console.debug(`[${color('date', date)}] ${message}.`);
+  console.debug(`[${color('date', date)}] ${message}`);
 };
 
 export const logTrace = (message: string) => {
@@ -23,7 +23,7 @@ export const logTrace = (message: string) => {
     return;
   }
   const date = new Date().toLocaleTimeString();
-  console.trace(`[${color('date', date)}] ${message}.`);
+  console.trace(`[${color('date', date)}] ${message}`);
 };
 
 export const logWarn = (message: string) => {
@@ -31,7 +31,7 @@ export const logWarn = (message: string) => {
     return;
   }
   const date = new Date().toLocaleTimeString();
-  console.warn(`[${color('date', date)}] ${message}.`);
+  console.warn(`[${color('date', date)}] ${color('warn', message)}`);
 };
 
 export const logError = (message: string) => {
@@ -39,7 +39,7 @@ export const logError = (message: string) => {
     return;
   }
   const date = new Date().toLocaleTimeString();
-  console.error(`[${color('date', date)}] ${message}.`);
+  console.error(`[${color('date', date)}] ${color('error', message)}`);
 };
 
 const isLogLevel = (desiredLogLevel: LogLevel, logLevel: LogLevel) => {
