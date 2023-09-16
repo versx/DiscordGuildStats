@@ -164,10 +164,12 @@ export const updateGuilds = async (client: Client, reset: boolean) => {
     if (guildConfig.memberRoles) {
       const roleStats = await getGuildMemberRoleCounts(guild, reset);
       for (const roleChannelId in roleStats) {
-        const roleStat = roleStats[roleChannelId];
-        if (await updateChannelName(guild, roleChannelId, roleStat.name)) {
-          updated = true;
-        }
+        const { text, count } = roleStats[roleChannelId];
+        const newName = `${text}: ${count.toLocaleString()}`;
+        await updateChannelName(guild, roleChannelId, newName);
+        //if (await updateChannelName(guild, roleChannelId, newName)) {
+        //  updated = true;
+        //}
       }
     }
 
@@ -209,7 +211,8 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
   // Check if the channel has been updated within the last 5 minutes, if so skip it to comply with Discord
   // Channel names can only be updated 2 within 10 minutes
   if (isAlreadyUpdated(channelLastUpdate[channelId], 10)) {
-    logWarn(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Unable to update channel name, already updated within the last 10 minutes, skipping...`);
+    const remaining = ((getTime() - channelLastUpdate[channelId]) / 60).toFixed(2);
+    logWarn(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Channel name already updated within the last 10 minutes (${remaining} minutes remaining), skipping...`);
     return false;
   }
 
@@ -230,7 +233,7 @@ export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean): Pr
   const roles: RoleStatistics = {};
   const memberRoles = guildConfig.memberRoles;
   for (const roleChannelId of Object.keys(memberRoles)) {
-    await sleep(config.sleepBetweenChannels);
+    //await sleep(config.sleepBetweenChannels);
 
     const channel = guild.channels.cache.get(roleChannelId);
     if (!channel) {
@@ -240,8 +243,7 @@ export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean): Pr
 
     const { text, roleIds } = memberRoles[roleChannelId];
     const count = reset ? 0 : guild.members.cache.filter((member) => hasRole(member, roleIds)).size;
-    const newName = `${text}: ${count.toLocaleString()}`;
-    roles[roleChannelId] = { name: newName, count, text };
+    roles[roleChannelId] = { text, count };
   }
   return roles;
 };
