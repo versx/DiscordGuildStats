@@ -25,6 +25,9 @@ import {
   RoleStatistics,
 } from '../types';
 
+const GuildChangesRateLimitM = 15;
+const ChannelChangesRateLimitM = 10;
+
 const config: DiscordGuildStatsConfig = require('../config.json');
 const guildLastUpdate: LastUpdateCache = {};
 const channelLastUpdate: LastUpdateCache = {};
@@ -81,6 +84,8 @@ export const updateGuilds = async (client: Client) => {
     return;
   }
 
+  log(`${color('text', `Starting sequence to check ${guilds.size.toLocaleString()} guild${isPlural(guilds.size)} for changes...`)}`);
+
   const stats: DumpStats = {};
   const guildIds = Object.keys(config.servers);
   for (const guildId of guildIds) {
@@ -91,7 +96,7 @@ export const updateGuilds = async (client: Client) => {
     }
 
     // Check if guild statistics have been updated recently
-    if (isAlreadyUpdated(guildLastUpdate[guildId], config.updateIntervalM > 0 ? config.updateIntervalM : 15)) {
+    if (isAlreadyUpdated(guildLastUpdate[guildId], config.updateIntervalM > 0 ? config.updateIntervalM : GuildChangesRateLimitM)) {
       logDebug(`[${color('variable', guild.name)}] Guild already updated within ${config.updateIntervalM} minute${isPlural(config.updateIntervalM)}, skipping...`);
       continue;
     }
@@ -179,7 +184,7 @@ export const updateGuilds = async (client: Client) => {
     }
 
     if (updated) {
-      log(`[${color('variable', guild.name)}] ${color('text', `Updated guild channel names...`)}`);
+      // TODO: Include how many?
 
       // Set time of last update for guild
       guildLastUpdate[guildId] = getTime();
@@ -210,9 +215,9 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
 
   // Check if the channel has been updated within the last 5 minutes, if so skip it to comply with Discord
   // Channel names can only be updated 2 within 10 minutes
-  if (isAlreadyUpdated(channelLastUpdate[channelId], 10)) {
-    const remaining = ((getTime() - channelLastUpdate[channelId]) / 60).toFixed(2);
-    logWarn(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Channel name already updated within the last 10 minutes (${remaining} minutes remaining), skipping...`);
+  if (isAlreadyUpdated(channelLastUpdate[channelId], ChannelChangesRateLimitM)) {
+    //const remaining = (10 - ((getTime() - channelLastUpdate[channelId]) / 60)).toFixed(2);
+    const remaining = getTimeRemaining(channelId, ChannelChangesRateLimitM);
     return false;
   }
 
@@ -224,17 +229,15 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
   return true;
 };
 
-export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean): Promise<RoleStatistics> => {
-  const guildConfig = config.servers[guild.id];
-  if (!guildConfig.memberRoles) {
+export const getGuildMemberRoleCounts = async (guild: Guild): Promise<RoleStatistics> => {
+  const roles: RoleStatistics = {};
+  const { memberRoles } = config.servers[guild.id];
+  if (!memberRoles) {
     return {};
   }
 
-  const roles: RoleStatistics = {};
-  const memberRoles = guildConfig.memberRoles;
-  for (const roleChannelId of Object.keys(memberRoles)) {
+  for (const roleChannelId in memberRoles) {
     //await sleep(config.sleepBetweenChannels);
-
     const channel = guild.channels.cache.get(roleChannelId);
     if (!channel) {
       logWarn(`[${color('variable', guild.name)}] [${color('variable', roleChannelId)}] Failed to get role channel.`);
@@ -242,7 +245,7 @@ export const getGuildMemberRoleCounts = async (guild: Guild, reset: boolean): Pr
     }
 
     const { text, roleIds } = memberRoles[roleChannelId];
-    const count = reset ? 0 : guild.members.cache.filter((member) => hasRole(member, roleIds)).size;
+    const count = guild.members.cache.filter((member) => hasRole(member, roleIds)).size;
     roles[roleChannelId] = { text, count };
   }
   return roles;
@@ -263,6 +266,18 @@ export const fetchGuild = async (guild: Guild) => {
   await guild.emojis.fetch();
   await guild.stickers.fetch();
   await guild.scheduledEvents.fetch();
+};
+export const getTimeRemaining = (channelId: Snowflake, timeLimit: number, precision: number = 2) => {
+  const now = getTime();
+  const delta = Math.round(now - channelLastUpdate[channelId]);
+  // Check if time remaining is less than one minute
+  if (delta < 60) {
+    return delta;
+  }
+
+  // Minutes remaining
+  const remaining = (timeLimit - (delta / 60)).toFixed(precision);
+  return remaining;
 };
 
 //export const getOrCreateCategory = async (guild: Guild, categoryName: string) => {
