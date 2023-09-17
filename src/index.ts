@@ -3,7 +3,7 @@ import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 import config from './config.json';
-import { color, isPlural, log, updateGuilds } from './services';
+import { color, isPlural, log, logError, updateGuilds } from './services';
 
 const loadHandlers = (client: Client) => {
   const handlersDir = join(__dirname, './handlers');
@@ -39,3 +39,5 @@ if (config.updateIntervalM > 0) {
 } else {
   log(color('text', `Update interval not specified, defaulting to Discord events to check for Discord guild changes...`));
 }
+
+process.on('exit', (code: number) => logError(`Process exiting with exit code: ${code}`));

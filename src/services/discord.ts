@@ -80,8 +80,8 @@ export const buildStatistics = async (guild: Guild, counts: GuildStatistics): Pr
 export const updateGuilds = async (client: Client) => {
   const guilds = client.guilds.cache.filter((guild) => !!config.servers[guild.id]);
   if (guilds.size === 0) {
-    logError(`[${color('variable', client.user?.id)}] Bot is not in any guilds, skipping...`);
-    return;
+    logError(`[${color('variable', client.user?.id)}] Bot is not in any configured guilds, exiting...`);
+    process.exit(-1);
   }
 
   log(`${color('text', `Starting sequence to check ${guilds.size.toLocaleString()} guild${isPlural(guilds.size)} for changes...`)}`);
@@ -219,8 +219,7 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
   // Check if the channel has been updated within the last 5 minutes, if so skip it to comply with Discord
   // Channel names can only be updated 2 within 10 minutes
   if (isAlreadyUpdated(channelLastUpdate[channelId], ChannelChangesRateLimitM)) {
-    //const remaining = (10 - ((getTime() - channelLastUpdate[channelId]) / 60)).toFixed(2);
-    const remaining = getTimeRemaining(channelId, ChannelChangesRateLimitM);
+     const remaining = getTimeRemaining(channelId, ChannelChangesRateLimitM);
     logWarn(`${logPrefix} Channel name already updated within the last ${ChannelChangesRateLimitM} minutes (${remaining} minutes remaining), skipping...`);
     return false;
   }
@@ -241,7 +240,6 @@ export const getGuildMemberRoleCounts = async (guild: Guild): Promise<RoleStatis
   }
 
   for (const roleChannelId in memberRoles) {
-    //await sleep(config.sleepBetweenChannels);
     const channel = guild.channels.cache.get(roleChannelId);
     if (!channel) {
       logWarn(`${getLogPrefix(guild, roleChannelId)} Failed to get role channel.`);

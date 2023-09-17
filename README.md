@@ -39,12 +39,12 @@ _**This is a rewrite in Typescript of my original [`GuildStats`](https://github.
 1. Install packages: `npm install`  
 1. Copy example config: `cp src/config.example.json src/config.json`  
 1. Fill out config options.  
-1. Build in root project folder: `npm run build`  
+1. Build project in root folder: `npm run build`  
 1. Run: `npm run start`  
 
 ## Updating  
 1. Pull latest changes in root folder `git pull`  
-1. Build project `npm run build`  
+1. Build project in root folder: `npm run build`  
 1. Run `npm run start`  
 
 ## Configuration  
@@ -91,7 +91,7 @@ _**This is a rewrite in Typescript of my original [`GuildStats`](https://github.
   "sleepBetweenChannels": 250,
   // Delay between each guild update in milliseconds.
   "sleepBetweenGuilds": 3000,
-  // Discord bot status.
+  // Discord bot activity status.
   "status": null,
   // Discord bot token.
   "token": "<DISCORD_BOT_TOKEN>",
