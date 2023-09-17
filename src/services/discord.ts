@@ -95,13 +95,14 @@ export const updateGuilds = async (client: Client) => {
       continue;
     }
 
+    const logPrefix = getLogPrefix(guild);
     // Check if guild statistics have been updated recently
     if (isAlreadyUpdated(guildLastUpdate[guildId], config.updateIntervalM > 0 ? config.updateIntervalM : GuildChangesRateLimitM)) {
-      logDebug(`[${color('variable', guild.name)}] Guild already updated within ${config.updateIntervalM} minute${isPlural(config.updateIntervalM)}, skipping...`);
+      logDebug(`${logPrefix} Guild already updated within ${config.updateIntervalM} minute${isPlural(config.updateIntervalM)}, skipping...`);
       continue;
     }
 
-    log(`[${color('variable', guild.name)}] ${color('text', `Checking guild for updates...`)}`);
+    log(`${logPrefix} ${color('text', `Checking guild for updates...`)}`);
 
     const counts: GuildStatistics = {
       members: guild.memberCount,
@@ -185,6 +186,7 @@ export const updateGuilds = async (client: Client) => {
 
     if (updated) {
       // TODO: Include how many?
+      log(`${logPrefix} ${color('text', `Updated guild channel names...`)}`);
 
       // Set time of last update for guild
       guildLastUpdate[guildId] = getTime();
@@ -202,14 +204,15 @@ export const updateGuilds = async (client: Client) => {
 };
 
 export const updateChannelName = async (guild: Guild, channelId: Snowflake, newName: string): Promise<boolean> => {
+  const logPrefix = getLogPrefix(guild, channelId);
   const channel = guild.channels.cache.get(channelId);
   if (!channel) {
-    logWarn(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Failed to get channel.`);
+    logWarn(`${logPrefix} Failed to get channel.`);
     return false;
   }
 
   if (channel.name === newName) {
-    logDebug(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Channel name already set to '${color('variable', newName)}', skipping...`);
+    logDebug(`${logPrefix} Channel name already set to '${color('variable', newName)}', skipping...`);
     return false;
   }
 
@@ -218,10 +221,11 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
   if (isAlreadyUpdated(channelLastUpdate[channelId], ChannelChangesRateLimitM)) {
     //const remaining = (10 - ((getTime() - channelLastUpdate[channelId]) / 60)).toFixed(2);
     const remaining = getTimeRemaining(channelId, ChannelChangesRateLimitM);
+    logWarn(`${logPrefix} Channel name already updated within the last ${ChannelChangesRateLimitM} minutes (${remaining} minutes remaining), skipping...`);
     return false;
   }
 
-  log(`[${color('variable', guild.name)}] [${color('variable', channelId)}] Channel name changed from '${color('variable', channel.name)}' to '${color('variable', newName)}'.`);
+  log(`${logPrefix} Channel name changed from '${color('variable', channel.name)}' to '${color('variable', newName)}'.`);
   await channel.setName(newName, 'update channel name');
   channelLastUpdate[channelId] = getTime();
 
@@ -240,7 +244,7 @@ export const getGuildMemberRoleCounts = async (guild: Guild): Promise<RoleStatis
     //await sleep(config.sleepBetweenChannels);
     const channel = guild.channels.cache.get(roleChannelId);
     if (!channel) {
-      logWarn(`[${color('variable', guild.name)}] [${color('variable', roleChannelId)}] Failed to get role channel.`);
+      logWarn(`${getLogPrefix(guild, roleChannelId)} Failed to get role channel.`);
       continue;
     }
 
@@ -267,6 +271,16 @@ export const fetchGuild = async (guild: Guild) => {
   await guild.stickers.fetch();
   await guild.scheduledEvents.fetch();
 };
+
+export const getLogPrefix = (guild: Guild, channelId?: Snowflake) => {
+  const prefixGuild = `[${color('variable', guild.name)}]`;
+  if (!channelId) {
+    return prefixGuild;
+  }
+  const prefixChannel = `[${color('variable', channelId)}]`;
+  return `${prefixGuild} ${prefixChannel}`;
+};
+
 export const getTimeRemaining = (channelId: Snowflake, timeLimit: number, precision: number = 2) => {
   const now = getTime();
   const delta = Math.round(now - channelLastUpdate[channelId]);
