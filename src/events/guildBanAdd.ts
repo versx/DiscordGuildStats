@@ -13,7 +13,7 @@ const event: BotEvent = {
     }
 
     logDebug(`[${guild.name}] User ${user.username} banned.`);
-    await updateGuilds(guild.client, false);
+    await updateGuilds(guild.client);
   },
 };
 

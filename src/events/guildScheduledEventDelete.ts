@@ -13,7 +13,7 @@ const event: BotEvent = {
     }
 
     logDebug(`[${guildScheduledEvent.guild?.name}] Scheduled event ${guildScheduledEvent.name} deleted.`);
-    await updateGuilds(guildScheduledEvent.client, false);
+    await updateGuilds(guildScheduledEvent.client);
   },
 };
 

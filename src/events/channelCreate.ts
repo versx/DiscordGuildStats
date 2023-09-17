@@ -13,7 +13,7 @@ const event: BotEvent = {
     }
 
     logDebug(`[${channel.guild.name}] Channel ${channel.name} created.`);
-    await updateGuilds(channel.client, false);
+    await updateGuilds(channel.client);
   },
 };
 

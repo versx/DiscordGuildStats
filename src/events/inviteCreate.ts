@@ -13,7 +13,7 @@ const event: BotEvent = {
     }
 
     logDebug(`[${invite.guild?.name}] Invite ${invite.code} created.`);
-    await updateGuilds(invite.client, false);
+    await updateGuilds(invite.client);
   },
 };
 

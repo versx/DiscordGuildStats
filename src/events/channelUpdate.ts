@@ -17,7 +17,7 @@ const event: BotEvent = {
       oldChannel.name !== newChannel.name ||
       oldChannel.permissionOverwrites !== newChannel.permissionOverwrites) {
     logDebug(`[${newChannel.guild.name}] Channel ${newChannel.name} updated.`);
-    await updateGuilds(newChannel.client, false);
+    await updateGuilds(newChannel.client);
   }
   },
 };

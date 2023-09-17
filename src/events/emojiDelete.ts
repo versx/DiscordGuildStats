@@ -14,7 +14,7 @@ const event: BotEvent = {
 
     //logDebug(`[${emoji.guild?.name}] Emoji ${emoji.name} created.`);
     logDebug(`[${emoji.id}] Emoji ${emoji.name} deleted.`);
-    await updateGuilds(emoji.client, false);
+    await updateGuilds(emoji.client);
   },
 };
 

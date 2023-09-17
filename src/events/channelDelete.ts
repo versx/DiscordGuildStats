@@ -13,7 +13,7 @@ const event: BotEvent = {
     }
 
     logDebug(`[${channel.guild.name}] Channel ${channel.name} deleted.`);
-    await updateGuilds(channel.client, false);
+    await updateGuilds(channel.client);
   },
 };
 

@@ -17,7 +17,7 @@ const event: BotEvent = {
       oldMember.roles.cache.size !== newMember.roles.cache.size ||
       oldMember.permissions !== newMember.permissions) {
       logDebug(`[${newMember.guild.name}] Member ${newMember.user.username} updated.`);
-      await updateGuilds(newMember.client, false);
+      await updateGuilds(newMember.client);
     }
   },
 };

@@ -13,7 +13,7 @@ const event: BotEvent = {
     }
 
     logDebug(`[${role.guild.name}] Role ${role.name} created.`);
-    await updateGuilds(role.client, false);
+    await updateGuilds(role.client);
   },
 };
 

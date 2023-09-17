@@ -46,7 +46,7 @@ const event: BotEvent = {
       //});
     }
 
-    await updateGuilds(client, false);
+    await updateGuilds(client);
   },
 };
 

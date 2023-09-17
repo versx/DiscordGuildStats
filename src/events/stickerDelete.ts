@@ -13,7 +13,7 @@ const event: BotEvent = {
     }
 
     logDebug(`[${sticker.guild?.name}] Sticker ${sticker.name} deleted.`);
-    await updateGuilds(sticker.client, false);
+    await updateGuilds(sticker.client);
   },
 };
 

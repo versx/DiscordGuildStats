@@ -17,7 +17,7 @@ const event: BotEvent = {
       oldRole.name !== newRole.name ||
       oldRole.permissions !== newRole.permissions) {
       logDebug(`[${newRole.guild.name}] Role ${newRole.name} updated.`);
-      await updateGuilds(newRole.client, false);
+      await updateGuilds(newRole.client);
     }
   },
 };

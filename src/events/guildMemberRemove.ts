@@ -13,7 +13,7 @@ const event: BotEvent = {
     }
 
     logDebug(`[${member.guild.name}] Member ${member.user.username} left.`);
-    await updateGuilds(member.client, false);
+    await updateGuilds(member.client);
   },
 };
 
