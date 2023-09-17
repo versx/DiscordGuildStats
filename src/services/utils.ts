@@ -67,3 +67,16 @@ export const dumpGuildStatistics = (fileName: string, stats: DumpStats) => {
 };
 
 export const isPlural = (value: number) => value > 1 ? 's' : '';
+
+export const getTimeRemaining = (lastUpdate: number, timeLimit: number, precision: number = 2) => {
+  const now = getTime();
+  const delta = Math.round(now - lastUpdate);
+  // Check if time remaining is less than one minute
+  if (delta < 60) {
+    return delta;
+  }
+
+  // Minutes remaining
+  const remaining = (timeLimit - (delta / 60)).toFixed(precision);
+  return remaining;
+};

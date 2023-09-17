@@ -9,7 +9,7 @@ import {
   color,
   dumpGuildStatistics,
   formatDate,
-  getTime,
+  getTime, getTimeRemaining,
   isAlreadyUpdated,
   isPlural,
   log, logDebug, logError, logWarn,
@@ -32,6 +32,12 @@ const config: DiscordGuildStatsConfig = require('../config.json');
 const guildLastUpdate: LastUpdateCache = {};
 const channelLastUpdate: LastUpdateCache = {};
 
+/**
+ * 
+ * @param guild 
+ * @param counts 
+ * @returns 
+ */
 export const buildStatistics = async (guild: Guild, counts: GuildStatistics): Promise<GuildDumpStats> => {
   const stats: GuildDumpStats = {
     Date: formatDate(new Date()),
@@ -77,7 +83,12 @@ export const buildStatistics = async (guild: Guild, counts: GuildStatistics): Pr
   return stats;
 };
 
-export const updateGuilds = async (client: Client) => {
+/**
+ * 
+ * @param client 
+ */
+export const updateGuilds = async (client: Client): Promise<void> => {
+  // Filter list of Discord guilds by those that are configured
   const guilds = client.guilds.cache.filter((guild) => !!config.servers[guild.id]);
   if (guilds.size === 0) {
     logError(`[${color('variable', client.user?.id)}] Bot is not in any configured guilds, exiting...`);
@@ -116,54 +127,61 @@ export const updateGuilds = async (client: Client) => {
       scheduledEvents: guild.scheduledEvents.cache.size,
     };
   
-    // TODO: const textChannelCount = guild.channels.cache.filter(channel => channel.type === ChannelType.GuildText).size;
-    // TODO: const voiceChannelCount = guild.channels.cache.filter(channel => channel.type === ChannelType.GuildVoice).size;
-  
     let updated = false;
+    let updateCount = 0;
     const guildConfig = config.servers[guildId];
     if (guildConfig.memberCountChannelId) {
       if (await updateChannelName(guild, guildConfig.memberCountChannelId, `${locales.Members}: ${counts.members.toLocaleString()}`)) {
         updated = true;
+        updateCount++;
       }
     }
     if (guildConfig.botCountChannelId) {
       if (await updateChannelName(guild, guildConfig.botCountChannelId, `${locales.Bots}: ${counts.bots.toLocaleString()}`)) {
         updated = true;
+        updateCount++;
       }
     }
     if (guildConfig.roleCountChannelId) {
       if (await updateChannelName(guild, guildConfig.roleCountChannelId, `${locales.Roles}: ${counts.roles.toLocaleString()}`)) {
         updated = true;
+        updateCount++;
       }
     }
     if (guildConfig.channelCountChannelId) {
       if (await updateChannelName(guild, guildConfig.channelCountChannelId, `${locales.Channels}: ${counts.channels.toLocaleString()}`)) {
         updated = true;
+        updateCount++;
       }
     }
     if (guildConfig.inviteCountChannelId) {
       if (await updateChannelName(guild, guildConfig.inviteCountChannelId, `${locales.Invites}: ${counts.invites.toLocaleString()}`)) {
         updated = true;
+        updateCount++;
       }
     }
     if (guildConfig.banCountChannelId) {
       if (await updateChannelName(guild, guildConfig.banCountChannelId, `${locales.Bans}: ${counts.bans.toLocaleString()}`)) {
         updated = true;
+        updateCount++;
       }
     }
     if (guildConfig.reactionCountChannelId) {
       if (await updateChannelName(guild, guildConfig.reactionCountChannelId, `${locales.Reactions}: ${counts.reactions.toLocaleString()}`)) {
         updated = true;
+        updateCount++;
       }
     }
     if (guildConfig.stickerCountChannelId) {
       if (await updateChannelName(guild, guildConfig.stickerCountChannelId, `${locales.Stickers}: ${counts.stickers.toLocaleString()}`)) {
         updated = true;
+        updateCount++;
       }
     }
     if (guildConfig.eventCountChannelId) {
       if (await updateChannelName(guild, guildConfig.eventCountChannelId, `${locales.ScheduledEvents}: ${counts.scheduledEvents.toLocaleString()}`)) {
         updated = true;
+        updateCount++;
       }
     }
 
@@ -172,10 +190,10 @@ export const updateGuilds = async (client: Client) => {
       for (const roleChannelId in roleStats) {
         const { text, count } = roleStats[roleChannelId];
         const newName = `${text}: ${count.toLocaleString()}`;
-        await updateChannelName(guild, roleChannelId, newName);
-        //if (await updateChannelName(guild, roleChannelId, newName)) {
-        //  updated = true;
-        //}
+        if (await updateChannelName(guild, roleChannelId, newName)) {
+          //updated = true;
+          updateCount++;
+        }
       }
     }
 
@@ -185,8 +203,7 @@ export const updateGuilds = async (client: Client) => {
     }
 
     if (updated) {
-      // TODO: Include how many?
-      log(`${logPrefix} ${color('text', `Updated guild channel names...`)}`);
+      log(`${logPrefix} ${color('text', `Updated ${updateCount.toLocaleString()} channel name${isPlural(updateCount)}...`)}`);
 
       // Set time of last update for guild
       guildLastUpdate[guildId] = getTime();
@@ -203,6 +220,13 @@ export const updateGuilds = async (client: Client) => {
   }
 };
 
+/**
+ * Updates a Discord Guild channel name if it differs from the new name.
+ * @param guild Discord guild.
+ * @param channelId Discord channel ID.
+ * @param newName New name of channel.
+ * @returns Returns a value indicating whether the channel name was updated or not.
+ */
 export const updateChannelName = async (guild: Guild, channelId: Snowflake, newName: string): Promise<boolean> => {
   const logPrefix = getLogPrefix(guild, channelId);
   const channel = guild.channels.cache.get(channelId);
@@ -218,8 +242,9 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
 
   // Check if the channel has been updated within the last 5 minutes, if so skip it to comply with Discord
   // Channel names can only be updated 2 within 10 minutes
-  if (isAlreadyUpdated(channelLastUpdate[channelId], ChannelChangesRateLimitM)) {
-     const remaining = getTimeRemaining(channelId, ChannelChangesRateLimitM);
+  const lastChannelUpdate = channelLastUpdate[channelId];
+  if (isAlreadyUpdated(lastChannelUpdate, ChannelChangesRateLimitM)) {
+     const remaining = getTimeRemaining(lastChannelUpdate, ChannelChangesRateLimitM);
     logWarn(`${logPrefix} Channel name already updated within the last ${ChannelChangesRateLimitM} minutes (${remaining} minutes remaining), skipping...`);
     return false;
   }
@@ -232,6 +257,11 @@ export const updateChannelName = async (guild: Guild, channelId: Snowflake, newN
   return true;
 };
 
+/**
+ * 
+ * @param guild 
+ * @returns 
+ */
 export const getGuildMemberRoleCounts = async (guild: Guild): Promise<RoleStatistics> => {
   const roles: RoleStatistics = {};
   const { memberRoles } = config.servers[guild.id];
@@ -253,12 +283,22 @@ export const getGuildMemberRoleCounts = async (guild: Guild): Promise<RoleStatis
   return roles;
 };
 
-export const hasRole = (member: GuildMember, roleIds: Snowflake[]) => {
-  const count = roleIds.filter((roleId) => member.roles.cache.has(roleId)).length;
+/**
+ * 
+ * @param member 
+ * @param roleIds 
+ * @returns 
+ */
+export const hasRole = (member: GuildMember, roleIds: Snowflake[]): boolean => {
+  const count = roleIds.filter((roleId) => member.roles.cache.has(roleId)).length > 0;
   return count;
 };
 
-export const fetchGuild = async (guild: Guild) => {
+/**
+ * Fetches all Discord guild data.
+ * @param guild 
+ */
+export const fetchGuild = async (guild: Guild): Promise<void> => {
   await guild.fetch();
   await guild.members.fetch();
   await guild.roles.fetch();
@@ -270,7 +310,13 @@ export const fetchGuild = async (guild: Guild) => {
   await guild.scheduledEvents.fetch();
 };
 
-export const getLogPrefix = (guild: Guild, channelId?: Snowflake) => {
+/**
+ * Builds a prefix used for logs.
+ * @param guild 
+ * @param channelId 
+ * @returns Returns a string used as a prefix for logs.
+ */
+export const getLogPrefix = (guild: Guild, channelId?: Snowflake): string => {
   const prefixGuild = `[${color('variable', guild.name)}]`;
   if (!channelId) {
     return prefixGuild;
@@ -278,35 +324,3 @@ export const getLogPrefix = (guild: Guild, channelId?: Snowflake) => {
   const prefixChannel = `[${color('variable', channelId)}]`;
   return `${prefixGuild} ${prefixChannel}`;
 };
-
-export const getTimeRemaining = (channelId: Snowflake, timeLimit: number, precision: number = 2) => {
-  const now = getTime();
-  const delta = Math.round(now - channelLastUpdate[channelId]);
-  // Check if time remaining is less than one minute
-  if (delta < 60) {
-    return delta;
-  }
-
-  // Minutes remaining
-  const remaining = (timeLimit - (delta / 60)).toFixed(precision);
-  return remaining;
-};
-
-//export const getOrCreateCategory = async (guild: Guild, categoryName: string) => {
-//  let category = guild.channels.cache.find((category) => category.type === ChannelType.GuildCategory && category.name === guildConfig.category.name);
-//  if (!category) {
-//    category = await guild.channels.create({
-//      name: categoryName,
-//      type: ChannelType.GuildCategory,
-//      //topic: '',
-//      position: 1,
-//      permissionOverwrites: [{
-//        allow: ['ViewChannel'],
-//        deny: ['Connect'],
-//        id: guild.id,
-//        type: OverwriteType.Role,
-//      }],
-//    });
-//  }
-//  return category;
-//};

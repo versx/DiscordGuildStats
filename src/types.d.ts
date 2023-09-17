@@ -57,7 +57,6 @@ export type DiscordGuildConfig = {
   memberRoles: {
     [roleId: Snowflake]: DiscordMemberRolesConfig;
   };
-  //category?: DiscordCategoryConfig;
 };
 
 export type LogColorsConfig = {
@@ -70,19 +69,11 @@ export type DiscordMemberRolesConfig = {
   roleIds: Snowflake[];
 };
 
-export type DiscordCategoryConfig = {
-  name: string;
-  stats: StatType[];
-  displayIndex: number;
-};
-
 export type RoleStatistics = {
-  [channelId: Snowflake]: RoleStatistic;
-};
-
-export type RoleStatistic = {
-  text: string;
-  count: number;
+  [channelId: Snowflake]: {
+    text: string;
+    count: number;
+  };
 };
 
 export type DumpStats = {
@@ -109,7 +100,7 @@ export type LastUpdateCache = {
   [id: Snowflake]: number;
 };
 
-export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'memberRoles' | 'invites' | 'bans' | 'reactions' | 'stickers' | 'scheduledEvents';
+export type StatType = 'members' | 'bots' | 'roles' | 'channels' | 'invites' | 'bans' | 'reactions' | 'stickers' | 'scheduledEvents' | 'memberRoles';
 
 export type ColorType = 'text' | 'variable' | 'warn' | 'error' | 'date';
 
